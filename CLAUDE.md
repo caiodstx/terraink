@@ -108,8 +108,11 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       original (ads/AdSense, donaciones Ko-fi, estrellas de GitHub, prompt
       de instalación PWA) por no encajar con una tienda de pago.
 - [x] Desactivar `includeCredits` por defecto; ads OFF.
-- [ ] Restyling de la atribución OSM: integrada en el bloque tipográfico o
-      esquina con bajo contraste. Legible de cerca.
+- [x] Restyling de la atribución OSM: integrada en el bloque tipográfico
+      (centrada, bajo la línea de coordenadas) con opacidad fija y baja
+      (0.6) en vez de esquina suelta. Legible de cerca. El crédito de la
+      app (`includeCredits`, opcional) se queda en la esquina inferior
+      izquierda sin cambios.
 - [x] Publicar el fork en GitHub (cumplimiento AGPL) con aviso de licencia
       → repo público en caiodstx/terraink.
 

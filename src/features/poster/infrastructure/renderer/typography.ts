@@ -7,7 +7,9 @@ import {
   TEXT_DIVIDER_Y_RATIO,
   TEXT_COUNTRY_Y_RATIO,
   TEXT_COORDS_Y_RATIO,
+  TEXT_ATTRIBUTION_Y_RATIO,
   TEXT_EDGE_MARGIN_RATIO,
+  ATTRIBUTION_OPACITY,
   CITY_FONT_BASE_PX,
   COUNTRY_FONT_BASE_PX,
   COORDS_FONT_BASE_PX,
@@ -22,7 +24,7 @@ export function drawPosterText(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  theme: { ui?: { text?: string } },
+  theme: { ui?: { text?: string }; map?: { land?: string } },
   center: Coordinate,
   city: string,
   country: string,
@@ -33,8 +35,8 @@ export function drawPosterText(
 ): void {
   const textColor = theme.ui?.text || "#111111";
   const landColor = theme.map?.land || "#808080";
-  const attributionColor = computeAttributionColor(textColor, landColor, showOverlay);
-  const attributionAlpha = showOverlay ? 0.55 : 0.9;
+  const creditsColor = computeAttributionColor(textColor, landColor, showOverlay);
+  const creditsAlpha = showOverlay ? 0.55 : 0.9;
   const titleFontFamily = fontFamily
     ? `"${fontFamily}", "Space Grotesk", sans-serif`
     : '"Space Grotesk", sans-serif';
@@ -85,21 +87,24 @@ export function drawPosterText(
     ctx.globalAlpha = 1;
   }
 
-  ctx.fillStyle = attributionColor;
-  ctx.globalAlpha = attributionAlpha;
-  ctx.textAlign = "right";
-  ctx.textBaseline = "bottom";
+  // OSM attribution lives centered inside the typographic block, under the
+  // coordinates line \u2014 integrated with the design rather than a loose
+  // corner banner, while staying legible up close (mandatory, ODbL).
+  ctx.fillStyle = textColor;
+  ctx.globalAlpha = ATTRIBUTION_OPACITY;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
   ctx.font = `300 ${attributionFontSize}px ${bodyFontFamily}`;
   ctx.fillText(
     "\u00a9 OpenStreetMap contributors",
-    width * (1 - TEXT_EDGE_MARGIN_RATIO),
-    height * (1 - TEXT_EDGE_MARGIN_RATIO),
+    width * 0.5,
+    height * TEXT_ATTRIBUTION_Y_RATIO,
   );
   ctx.globalAlpha = 1;
 
   if (includeCredits) {
-    ctx.fillStyle = attributionColor;
-    ctx.globalAlpha = attributionAlpha;
+    ctx.fillStyle = creditsColor;
+    ctx.globalAlpha = creditsAlpha;
     ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
     ctx.font = `300 ${attributionFontSize}px ${bodyFontFamily}`;

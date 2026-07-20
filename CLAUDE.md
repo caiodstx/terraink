@@ -1,124 +1,139 @@
-# Terraink — Claude Code Guide
+# CLAUDE.md — Tienda de mapas personalizados (print on demand)
 
-## Commands
+## Qué es este proyecto
 
-```bash
-bun install          # install dependencies
-bun run dev          # start dev server (http://localhost:5173)
-bun run build        # production build
-bun run typecheck    # type-check without emitting
-```
+E-commerce D2C de cuadros de mapas de ciudades personalizables. El cliente
+elige su ciudad, ajusta colores/capas/texto en un editor en vivo, elige
+tamaño y marco, paga, y el póster se imprime y envía vía print on demand
+(Gelato). Sin stock, sin logística propia, coste fijo ~0€.
 
-## Architecture: Feature-based + Hexagonal/Clean
+Referencia visual: pósters estilo "midnight blue + gold" (fondo azul
+oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 
-Source is split into vertical feature slices under `src/features/`:
+## Stack decidido
 
-```text
-src/
-  features/
-    export/       location/     map/          markers/
-    install/      layout/       poster/       theme/       updates/
-  core/
-    cache/        fonts/        http/
-    config.ts     services.ts
-  shared/
-    geo/          hooks/        ui/           utils/
-  data/           styles/       types/
-```
+- **Motor de personalización:** fork de [terraink](https://github.com/yousifamanuel/terraink)
+  — React 18 + TypeScript + Vite + MapLibre GL. Corre con Bun.
+  Trae Dockerfile, docker-compose y nginx.conf.
+- **Tiles:** OpenFreeMap (`https://tiles.openfreemap.org/planet`), esquema
+  OpenMapTiles. Gratis, sin API key, uso comercial permitido. Cero coste
+  variable por mapa.
+- **Backend nuevo (a crear):** API pequeña (Node/Bun + Hono o Express)
+  para upload del diseño exportado, checkout y webhooks.
+- **Pagos:** Stripe Checkout.
+- **POD:** Gelato API (producción local en España, sin cuota mensual).
+- **Storage de diseños:** S3-compatible (Cloudflare R2 recomendado, tier
+  gratuito) para guardar el PDF/PNG exportado hasta que Gelato lo recoja.
+- **Hosting:** VPS propio con Docker (frontend estático + API + nginx).
 
-Each feature has up to four layers:
+## Restricciones legales — NO NEGOCIABLES
 
-| Layer | Purpose | React allowed |
-| --- | --- | --- |
-| `domain/` | Pure types, port interfaces, pure logic | No |
-| `application/` | Hooks that orchestrate use cases | Yes |
-| `infrastructure/` | Concrete adapters (HTTP, cache, parsers) | No |
-| `ui/` | Components that read context and dispatch | Yes |
+1. **AGPL-3.0:** terraink es AGPL-3.0-only. Al ofrecer el fork modificado
+   como servicio web, hay que publicar el código fuente del fork (repo
+   público en GitHub con las modificaciones). El backend de checkout/Gelato
+   puede ser un servicio separado y privado si no deriva del código AGPL —
+   mantenerlo en repo/proceso independiente, comunicación solo por HTTP.
+2. **Marca Terraink:** eliminar TODO branding "Terraink" de UI, títulos,
+   metadatos y exports (ver TRADEMARK.md del repo). No usar el nombre en
+   dominio, marketing ni la web.
+3. **Atribución OSM (ODbL):** obligatoria en el póster impreso. Ya se
+   renderiza en `src/features/poster/infrastructure/renderer/typography.ts`
+   (esquina inferior derecha, alpha 0.55–0.9). Se puede integrar en el
+   diseño (mismo tono que el fondo con ~15-20% de contraste, o dentro del
+   bloque tipográfico bajo las coordenadas) pero debe seguir siendo legible
+   de cerca. NO eliminarla.
+4. El crédito "© terraink.app" del export está detrás del flag
+   `includeCredits` — desactivarlo es legítimo (no es la atribución OSM).
 
-### Layer import rules
+## Mapa del repo terraink (hallazgos ya verificados)
 
-| Layer | May import | Must not import |
-| --- | --- | --- |
-| `domain/` | nothing | infrastructure, application, ui, React |
-| `application/` | domain, shared, core/config, core/services | infrastructure directly |
-| `infrastructure/` | domain, shared, core | application, ui, React |
-| `ui/` | domain, application, shared/ui, shared/utils | infrastructure directly |
-| `core/services.ts` | infrastructure adapters | any feature |
+- `src/core/config.ts` — constantes (tamaños póster 4–45cm, zoom, defaults,
+  flags de ads vía env vars `VITE_ADS_*` — dejar OFF).
+- `src/features/map/infrastructure/maplibreStyle.ts` — fuente de tiles
+  (OpenFreeMap planet).
+- `src/features/poster/infrastructure/renderer/typography.ts` — bloque
+  tipográfico del póster: título, país, coordenadas, atribución OSM y
+  crédito terraink (flag `includeCredits`). Aquí se ajusta el estilo de la
+  atribución.
+- `src/features/export/` — exportadores: canvas PNG y
+  `layeredSvgExporter.ts` (SVG por capas, ideal para imprenta).
+- `src/features/theme/` — sistema de temas (colores hex editables en vivo).
+- Arquitectura hexagonal por features (application/domain/infrastructure/ui).
+- ~143 ficheros TS, 1.4MB de src. Fuentes empaquetadas via @fontsource.
 
-## State Management
+## Flujo de compra (a construir)
 
-- Single source of truth: `PosterContext` — React Context + `useReducer`
-- `posterReducer.ts` owns `PosterState`, `PosterForm`, and `PosterAction`
-- Components call `usePosterContext()` directly — no prop drilling
-- Side-effect logic lives in application hooks: `useFormHandlers`, `useMapSync`, `useGeolocation`, `useLocationAutocomplete`, `useCurrentLocation`, `useExport`
+1. Cliente diseña en el editor (fork terraink) → clic "Comprar".
+2. Frontend genera el export final (SVG/PDF a 300dpi del tamaño elegido)
+   en el navegador.
+3. `POST /api/designs` → sube el fichero a R2, devuelve `designId`.
+4. `POST /api/checkout` con `designId` + variante (tamaño/papel/marco) →
+   crea sesión de Stripe Checkout → redirect.
+5. Webhook `checkout.session.completed` → crea pedido en Gelato API con la
+   URL firmada del fichero en R2 + dirección del cliente.
+6. Webhooks de Gelato (producción/envío) → emails de estado al cliente.
+7. Job de limpieza: borrar diseños de R2 no comprados a los 30 días.
 
-## Key Services (`src/core/services.ts`)
+## Catálogo y precios (validar costes reales con cuenta Gelato)
 
-```ts
-searchLocations            // location autocomplete
-geocodeLocation            // name → coordinates
-reverseGeocodeCoordinates  // coordinates → name
-ensureGoogleFont           // font loading
-compositeExport            // poster compositing
-captureMapAsCanvas         // map → canvas
-createPngBlob / createPdfBlobFromCanvas / createLayeredSvgBlobFromMap
-createPosterFilename       // generate export filename
-triggerDownloadBlob        // file download
-```
+| Producto | Coste est. (prod+envío ES) | PVP | Margen bruto |
+|---|---|---|---|
+| Póster 30x40 premium matte | ~9-12€ | 29€ | ~17-19€ |
+| Póster 50x70 | ~13-18€ | 44€ | ~26-30€ |
+| Enmarcado madera 30x40 | ~29-38€ | 59€ | ~21-30€ |
+| Enmarcado madera 50x70 | ~43-57€ | 89€ | ~35-45€ |
 
-Never call `fetch()`, `localStorage`, or external APIs directly — always go through services.
+- Papel: Premium Matte 200gsm (best-seller de Gelato).
+- Formatos con ratio consistente cm/pulgadas: 30x40, 50x70, 70x100.
+- El margen fuerte está en enmarcados — empujarlos en la UI.
+- Restar comisión Stripe (~1,4% + 0,25€) y considerar IVA.
+- OJO: verificar que el enmarcado 50x70 se produce en España (no Alemania)
+  o el envío se come el margen.
 
-## TypeScript
+## Fases de desarrollo
 
-- All new files: `.ts` / `.tsx`. No `.js` in `src/`.
-- `strict: false`, `allowJs: true` — gradual migration is fine
-- Use `@/` alias for all cross-feature imports — never `../../` across feature boundaries
-- Port interfaces go in `domain/ports.ts` or `core/*/ports.ts` with an `I` prefix (`ICache`, `IHttp`)
+### Fase 0 — Validación (sin código)
+- [ ] Crear cuenta Gelato (descuento 30% primeras 48h) y volcar precios
+      reales al catálogo de arriba.
+- [ ] Pedir póster de prueba con un diseño midnight blue para validar
+      calidad de impresión de fondos oscuros en matte.
+- [ ] Elegir nombre de marca y dominio (sin "terraink").
 
-## Environment Variables
+### Fase 1 — Fork funcional en local
+- [ ] Fork del repo, `bun install`, `bun run dev`, verificar que corre.
+- [ ] Eliminar branding Terraink (UI, meta, manifest) según TRADEMARK.md.
+- [ ] Desactivar `includeCredits` por defecto; ads OFF.
+- [ ] Restyling de la atribución OSM: integrada en el bloque tipográfico o
+      esquina con bajo contraste. Legible de cerca.
+- [ ] Publicar el fork en GitHub (cumplimiento AGPL) con aviso de licencia.
 
-All `VITE_*` vars are accessed **only** through `src/core/config.ts`. Never read `import.meta.env.*` anywhere else. Env vars are optional for local development — never assume they are present for core functionality. See `.env.example` for the full list.
+### Fase 2 — Backend de pedidos
+- [ ] API: `POST /designs` (upload a R2), `POST /checkout` (Stripe),
+      webhook Stripe → pedido Gelato, webhooks Gelato → emails.
+- [ ] Repo separado y privado. Sin código derivado de terraink.
+- [ ] Sandbox: Stripe test mode + Gelato tiene entorno de pruebas.
+- [ ] Docker compose: frontend + api + nginx en el VPS.
 
-## Naming Conventions
+### Fase 3 — Capa de tienda
+- [ ] Selector tamaño/papel/marco en el flujo del editor con precios.
+- [ ] Página de producto/landing con ejemplos (Gijón, Oviedo, Madrid...).
+- [ ] Emails transaccionales (confirmación, envío) — Resend o SMTP propio.
+- [ ] Legal ES: aviso legal, RGPD, condiciones de venta, desistimiento
+      (nota: producto personalizado = exento de devolución art. 103 LGDCU,
+      indicarlo claramente en checkout).
 
-- Components: `PascalCase.tsx`
-- Hooks: `useCamelCase.ts`
-- Utilities / pure functions: `camelCase.ts`
-- Port interfaces: `I` prefix — `ICache`, `IHttp`, `IGeocodePort`
-- CSS classes: `kebab-case` with a matching rule in `src/styles/`
+### Fase 4 — Lanzamiento
+- [ ] Pedido real end-to-end de prueba.
+- [ ] SEO local: landings por ciudad española pre-renderizadas.
+- [ ] Diferenciación vs Mapiful/Grafomap: precio (producción EU),
+      personalización profunda (colores hex libres, capas), nicho local.
 
-## Commit Style
+## Convenciones de trabajo
 
-Format: `<emoji> <type>(<scope>): <subject>`
-
-```
-🐛 fix(location): fix reverse geocode on startup
-♻️ refactor(core): simplify validation flow
-✨ feat(map): add zoom-to-fit button
-```
-
-One logical change per commit. Subject: lowercase, imperative, no trailing period, max 50 chars, full line max 72 chars.
-
-## Branch Strategy
-
-```text
-feature/fix branch → dev → beta → main
-```
-
-All PRs target `dev`. Never open PRs against `main` or `beta`.
-
-**Do not create a new branch for features/fixes unless the user explicitly
-demands it.** By default, commit directly to the current branch. The
-`feature/fix → dev → beta → main` flow above describes the user's own
-workflow — it is not a cue for Claude to auto-branch.
-
-## Do Not
-
-- Add logic to `App.tsx` — it must stay a thin shell
-- Import from `@/lib/`, `@/utils/`, `@/hooks/`, or `@/components/` — those paths do not exist; use `@/shared/`
-- Duplicate utilities — check `shared/utils/` and `shared/geo/` before creating new ones
-- Call `fetch()`, `localStorage`, or `new URL()` inside components or hooks — use `core/services.ts`
-- Add a CSS class without a matching rule in `src/styles/`
-- Prop-drill state more than one level — use `usePosterContext()`
-- Read any file's exports from memory — always verify the actual source first
-- Edit `bun.lock` manually — run `bun install`
+- Idioma de código/comentarios: español en comentarios, inglés en
+  identificadores.
+- Commits pequeños y descriptivos. Antes de cambios grandes en el fork,
+  rama nueva.
+- No tocar la lógica del renderer salvo estilo de atribución — el motor
+  ya funciona.
+- Todo cambio de producción con pasos de rollback documentados.

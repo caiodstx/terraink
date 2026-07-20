@@ -92,20 +92,26 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 
 ## Fases de desarrollo
 
-### Fase 0 — Validación (sin código)
-- [ ] Crear cuenta Gelato (descuento 30% primeras 48h) y volcar precios
+### Fase 0 — Validación (sin código) ✅ COMPLETA (2026-07-20)
+- [x] Crear cuenta Gelato (descuento 30% primeras 48h) y volcar precios
       reales al catálogo de arriba.
-- [ ] Pedir póster de prueba con un diseño midnight blue para validar
+- [x] Pedir póster de prueba con un diseño midnight blue para validar
       calidad de impresión de fondos oscuros en matte.
-- [ ] Elegir nombre de marca y dominio (sin "terraink").
+- [x] Elegir nombre de marca y dominio (sin "terraink") → **Mapagrama**
+      (mapagrama.com).
 
 ### Fase 1 — Fork funcional en local
-- [ ] Fork del repo, `bun install`, `bun run dev`, verificar que corre.
-- [ ] Eliminar branding Terraink (UI, meta, manifest) según TRADEMARK.md.
-- [ ] Desactivar `includeCredits` por defecto; ads OFF.
+- [x] Fork del repo, `bun install`, `bun run dev`, verificar que corre.
+- [x] Eliminar branding Terraink (UI, meta, manifest) según TRADEMARK.md →
+      renombrado a Mapagrama en toda la UI, metadata e identificadores
+      internos. También se eliminaron las features del modelo gratuito
+      original (ads/AdSense, donaciones Ko-fi, estrellas de GitHub, prompt
+      de instalación PWA) por no encajar con una tienda de pago.
+- [x] Desactivar `includeCredits` por defecto; ads OFF.
 - [ ] Restyling de la atribución OSM: integrada en el bloque tipográfico o
       esquina con bajo contraste. Legible de cerca.
-- [ ] Publicar el fork en GitHub (cumplimiento AGPL) con aviso de licencia.
+- [x] Publicar el fork en GitHub (cumplimiento AGPL) con aviso de licencia
+      → repo público en caiodstx/terraink.
 
 ### Fase 2 — Backend de pedidos
 - [ ] API: `POST /designs` (upload a R2), `POST /checkout` (Stripe),

@@ -1,6 +1,6 @@
 export type LegalDocType = "privacy" | "imprint";
 
-export const LEGAL_DOC_EVENT = "terraink:legal-doc";
+export const LEGAL_DOC_EVENT = "mapagrama:legal-doc";
 
 export interface LegalDocDetail {
   doc: LegalDocType;

@@ -1,7 +1,7 @@
 {
-  "name": "Terraink",
-  "short_name": "Terraink",
-  "description": "Free map poster and wallpaper creator. Design custom, print-ready map art for any location — export as PNG, PDF, or SVG.",
+  "name": "Mapagrama",
+  "short_name": "Mapagrama",
+  "description": "Design your own custom map poster for any city — pick colours, streets, and text, then order it printed and shipped.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

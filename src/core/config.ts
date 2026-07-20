@@ -39,61 +39,20 @@ export const DEFAULT_LON = 9.732;
 export const DEFAULT_CITY = "Hanover";
 export const DEFAULT_COUNTRY = "Germany";
 
-/**
- * Per-type switches for ad components. Each ad placement is OFF unless its
- * VITE_ADS_*_ENABLED var is explicitly set to "true".
- *   infeed  → theme list + map settings
- *   sidebar → poster preview panel
- *   modal   → post-download support modal
- */
-const adTypeEnabled = (value: unknown): boolean =>
-  String(value ?? "").trim().toLowerCase() === "true";
-
-export const ADS_INFEED_ENABLED = adTypeEnabled(
-  import.meta.env.VITE_ADS_INFEED_ENABLED,
-);
-export const ADS_SIDEBAR_ENABLED = adTypeEnabled(
-  import.meta.env.VITE_ADS_SIDEBAR_ENABLED,
-);
-export const ADS_MODAL_ENABLED = adTypeEnabled(
-  import.meta.env.VITE_ADS_MODAL_ENABLED,
-);
-
-export const ADSENSE_AD_CLIENT = import.meta.env.VITE_ADSENSE_AD_CLIENT ?? "";
-export const AD_SLOT_INFEED = import.meta.env.VITE_AD_SLOT_INFEED ?? "";
-// data-ad-layout-key for the in-feed (fluid) unit — generated in AdSense.
-export const AD_LAYOUT_KEY_INFEED =
-  import.meta.env.VITE_AD_LAYOUT_KEY_INFEED ?? "";
-export const AD_SLOT_SIDEBAR = import.meta.env.VITE_AD_SLOT_SIDEBAR ?? "";
-export const AD_SLOT_MODAL = import.meta.env.VITE_AD_SLOT_MODAL ?? "";
-
-export const REPO_URL = import.meta.env.VITE_REPO_URL ?? "";
-export const REPO_API_URL = import.meta.env.VITE_REPO_API_URL ?? "";
 export const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? "";
 /* Raw markdown URLs (e.g. raw.githubusercontent.com) for the in-app legal
    modal — imprint and privacy docs pulled from the meta repo. */
 export const LEGAL_NOTICE_URL = import.meta.env.VITE_LEGAL_NOTICE_URL ?? "";
 export const PRIVACY_URL = import.meta.env.VITE_PRIVACY_URL ?? "";
 
-export const SOCIAL_LINKEDIN = import.meta.env.VITE_SOCIAL_LINKEDIN ?? "";
-export const SOCIAL_INSTAGRAM = import.meta.env.VITE_SOCIAL_INSTAGRAM ?? "";
-export const SOCIAL_REDDIT = import.meta.env.VITE_SOCIAL_REDDIT ?? "";
-export const SOCIAL_THREADS = import.meta.env.VITE_SOCIAL_THREADS ?? "";
-export const SOCIAL_YOUTUBE = import.meta.env.VITE_SOCIAL_YOUTUBE ?? "";
-export const KOFI_URL = import.meta.env.VITE_KOFI_URL ?? "";
-export const DEVELOPER_NAME = import.meta.env.VITE_DEVELOPER_NAME ?? "";
-export const DEVELOPER_PROFILE_URL =
-  import.meta.env.VITE_DEVELOPER_PROFILE_URL ?? "";
 export const APP_CREDIT_URL =
-  import.meta.env.VITE_APP_CREDIT_URL ?? "terraink.app";
+  import.meta.env.VITE_APP_CREDIT_URL ?? "mapagrama.com";
 export const APP_VERSION = String(
   import.meta.env.VITE_APP_VERSION ?? "0.0.0",
 ).trim();
 export const UPDATES_URL = String(
   import.meta.env.VITE_UPDATES_URL ?? "/updates.json",
 ).trim();
-
-export const INSTALL_DIAGNOSTICS_ENABLED = false;
 
 export interface FontOption {
   value: string;

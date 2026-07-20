@@ -21,19 +21,7 @@ import {
 } from "@/core/config";
 import { trackEvent, setUserProperty } from "@/core/services";
 
-export const ADBLOCK_LIMIT_EVENT = "terraink:adblock-limit";
-export const ADBLOCK_WARN_EVENT = "terraink:adblock-warn";
-
-const EXPORT_COUNT_STORAGE_KEY = "terraink.poster.count";
-
-export type SupportPromptVariant = "follow";
-
-export interface SupportPromptState {
-  posterNumber: number;
-  variant: SupportPromptVariant;
-}
-
-export const SUPPORT_PROMPT_EVENT = "terraink:support-prompt";
+const EXPORT_COUNT_STORAGE_KEY = "mapagrama.poster.count";
 
 // Use a 1-year TTL so the export count persists across sessions.
 const EXPORT_COUNT_TTL_MS = 365 * 24 * 60 * 60 * 1000;
@@ -109,20 +97,6 @@ export function useExport() {
 
   const registerSuccessfulExport = useCallback((nextCount: number) => {
     writePosterExportCount(nextCount);
-
-    // Prompt cadence: follow on the first download and every 5th after → 1, 6, 11, …
-    // Donate lives in the header; ad interstitials are handled by Google's
-    // vignette/Offerwall, not a custom modal.
-    let variant: SupportPromptVariant | null = null;
-    if ((nextCount - 1) % 5 === 0) variant = "follow";
-
-    if (variant) {
-      window.dispatchEvent(
-        new CustomEvent(SUPPORT_PROMPT_EVENT, {
-          detail: { posterNumber: nextCount, variant },
-        }),
-      );
-    }
   }, []);
 
   const exportPoster = useCallback(

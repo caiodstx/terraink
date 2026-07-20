@@ -1,5 +1,5 @@
-const CACHE_NAME = "terraink-static-v2";
-const TILE_CACHE_NAME = "terraink-tiles-v1";
+const CACHE_NAME = "mapagrama-static-v2";
+const TILE_CACHE_NAME = "mapagrama-tiles-v1";
 const TILE_ORIGINS = ["https://tiles.openfreemap.org"];
 const APP_SHELL_ASSETS = [
   "/",

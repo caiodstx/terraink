@@ -9,18 +9,9 @@ import DesktopNavBar from "@/shared/ui/DesktopNavBar";
 import FooterNote from "@/shared/ui/FooterNote";
 import PreviewPanel from "@/features/poster/ui/PreviewPanel";
 import MobileNavBar, { type MobileTab } from "@/shared/ui/MobileNavBar";
-import InstallPrompt from "@/features/install/ui/InstallPrompt";
 import { useSwipeDown } from "@/shared/hooks/useSwipeDown";
 import StartupLocationModal from "@/features/location/ui/StartupLocationModal";
 import { CheckIcon } from "@/shared/ui/Icons";
-import SupportModal from "@/features/export/ui/SupportModal";
-import AdBlockModal from "@/features/export/ui/AdBlockModal";
-import {
-  SUPPORT_PROMPT_EVENT,
-  ADBLOCK_LIMIT_EVENT,
-  ADBLOCK_WARN_EVENT,
-  type SupportPromptState,
-} from "@/features/export/application/useExport";
 import { useSessionAnalytics } from "@/features/export/application/useSessionAnalytics";
 import {
   LEGAL_DOC_EVENT,
@@ -28,7 +19,6 @@ import {
   type LegalDocType,
 } from "@/features/legal/application/legalDoc";
 
-const AboutModal = lazy(() => import("@/shared/ui/AboutModal"));
 const LegalModal = lazy(() => import("@/features/legal/ui/LegalModal"));
 const SettingsPanel = lazy(() => import("@/features/poster/ui/SettingsPanel"));
 const AnnouncementModal = lazy(
@@ -78,7 +68,7 @@ function SettingsDrawer({
 export default function AppShell() {
   const { state, dispatch } = usePosterContext();
 
-  // Fire once-per-session analytics on load (app_open + ad-block rate).
+  // Fire once-per-session app_open analytics on load.
   useSessionAnalytics();
   const { isMarkerEditorActive } = state;
   const activeMarker =
@@ -98,21 +88,7 @@ export default function AppShell() {
   const [desktopPanelOpen, setDesktopPanelOpen] = useState(false);
   const [desktopLocationRowVisible, setDesktopLocationRowVisible] =
     useState(true);
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [supportPrompt, setSupportPrompt] = useState<SupportPromptState | null>(null);
-  const [adBlockModal, setAdBlockModal] = useState<{
-    variant: "warning" | "limit";
-    hoursUntilReset?: number;
-  } | null>(null);
   const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      setSupportPrompt((e as CustomEvent<SupportPromptState>).detail);
-    };
-    window.addEventListener(SUPPORT_PROMPT_EVENT, handler);
-    return () => window.removeEventListener(SUPPORT_PROMPT_EVENT, handler);
-  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -120,21 +96,6 @@ export default function AppShell() {
     };
     window.addEventListener(LEGAL_DOC_EVENT, handler);
     return () => window.removeEventListener(LEGAL_DOC_EVENT, handler);
-  }, []);
-
-  useEffect(() => {
-    const handler = () => setAdBlockModal({ variant: "warning" });
-    window.addEventListener(ADBLOCK_WARN_EVENT, handler);
-    return () => window.removeEventListener(ADBLOCK_WARN_EVENT, handler);
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const { hoursUntilReset } = (e as CustomEvent).detail;
-      setAdBlockModal({ variant: "limit", hoursUntilReset });
-    };
-    window.addEventListener(ADBLOCK_LIMIT_EVENT, handler);
-    return () => window.removeEventListener(ADBLOCK_LIMIT_EVENT, handler);
   }, []);
 
   useEffect(() => {
@@ -238,8 +199,7 @@ export default function AppShell() {
       data-mobile-tab={mobileTab}
       data-desktop-tab={desktopTab}
     >
-      <GeneralHeader onAboutOpen={() => setAboutOpen(true)} />
-      <InstallPrompt />
+      <GeneralHeader />
       <StartupLocationModal />
 
       <DesktopNavBar
@@ -341,24 +301,6 @@ export default function AppShell() {
       <Suspense fallback={null}>
         <AnnouncementModal />
       </Suspense>
-      {aboutOpen ? (
-        <Suspense fallback={null}>
-          <AboutModal onClose={() => setAboutOpen(false)} />
-        </Suspense>
-      ) : null}
-      {supportPrompt ? (
-        <SupportModal
-          posterNumber={supportPrompt.posterNumber}
-          onClose={() => setSupportPrompt(null)}
-        />
-      ) : null}
-      {adBlockModal ? (
-        <AdBlockModal
-          variant={adBlockModal.variant}
-          hoursUntilReset={adBlockModal.hoursUntilReset}
-          onClose={() => setAdBlockModal(null)}
-        />
-      ) : null}
       {legalDoc ? (
         <Suspense fallback={null}>
           <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />

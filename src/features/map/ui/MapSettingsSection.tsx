@@ -13,11 +13,9 @@ import {
   createFallbackThemeOption,
 } from "@/features/theme/domain/colorSuggestions";
 import LayoutCard from "@/features/layout/ui/LayoutCard";
-import MapDimensionFields from "./MapDimensionFields";
 import ColorPicker from "@/features/theme/ui/ColorPicker";
 import ThemeColorEditor from "@/features/theme/ui/ThemeColorEditor";
 import ThemeSummarySection from "@/features/theme/ui/ThemeSummarySection";
-import { CheckIcon, EditIcon } from "@/shared/ui/Icons";
 import type { ResolvedTheme } from "@/features/theme/domain/types";
 import type { LayoutGroup } from "@/features/layout/domain/types";
 
@@ -43,15 +41,11 @@ interface MapSettingsForm {
 interface MapSettingsSectionProps {
   activeMobileTab?: string;
   form: MapSettingsForm;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onNumericFieldBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   onThemeChange: (themeId: string) => void;
   onLayoutChange: (layoutId: string) => void;
   selectedTheme: ResolvedTheme;
   themeOptions: ThemeOption[];
   layoutGroups: LayoutGroup[];
-  minPosterCm: number;
-  maxPosterCm: number;
   customColors: Record<string, string>;
   onColorChange: (key: string, value: string) => void;
   onResetColors: () => void;
@@ -61,22 +55,17 @@ interface MapSettingsSectionProps {
 export default function MapSettingsSection({
   activeMobileTab,
   form,
-  onChange,
-  onNumericFieldBlur,
   onThemeChange,
   onLayoutChange,
   selectedTheme,
   themeOptions,
   layoutGroups,
-  minPosterCm,
-  maxPosterCm,
   customColors,
   onColorChange,
   onResetColors,
   onColorEditorActiveChange,
 }: MapSettingsSectionProps) {
   const [isThemeEditing, setIsThemeEditing] = useState(false);
-  const [isLayoutEditing, setIsLayoutEditing] = useState(false);
   const defaultColorKey: ThemeColorKey = DISPLAY_PALETTE_KEYS[0] ?? "ui.bg";
   const [activeColorKey, setActiveColorKey] = useState<ThemeColorKey | null>(
     null,
@@ -181,7 +170,6 @@ export default function MapSettingsSection({
 
   function handleLayoutSelectInline(layoutId: string) {
     onLayoutChange(layoutId);
-    setIsLayoutEditing(false);
   }
 
   function handleSwatchClick(key: ThemeColorKey) {
@@ -204,15 +192,6 @@ export default function MapSettingsSection({
   function handleDoneThemeEditor() {
     setIsThemeEditing(false);
     clearColorPickerState();
-  }
-
-  function handleOpenLayoutEditor() {
-    setIsLayoutEditing(true);
-    onLayoutChange("custom");
-  }
-
-  function handleDoneLayoutEditor() {
-    setIsLayoutEditing(false);
   }
 
   function handleResetThemeColors() {
@@ -286,7 +265,7 @@ export default function MapSettingsSection({
   }, [activeMobileTab]);
 
   useEffect(() => {
-    if (activeMobileTab !== "layout" || isLayoutEditing) {
+    if (activeMobileTab !== "layout") {
       return;
     }
     const frameId = window.requestAnimationFrame(() => {
@@ -301,7 +280,7 @@ export default function MapSettingsSection({
       });
     });
     return () => window.cancelAnimationFrame(frameId);
-  }, [activeMobileTab, isLayoutEditing]);
+  }, [activeMobileTab]);
 
   const editorKey = activeColorKey || defaultColorKey;
   const editorChoices = activeColorKey
@@ -388,61 +367,25 @@ export default function MapSettingsSection({
               {selectedLayoutDescription}
             </p>
           </div>
-          {isLayoutEditing ? (
-            <button
-              type="button"
-              className="theme-customize-btn"
-              onClick={handleDoneLayoutEditor}
-              aria-label="Done editing layout"
-            >
-              <span className="theme-customize-icon" aria-hidden="true">
-                <CheckIcon />
-              </span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="theme-customize-btn"
-              onClick={handleOpenLayoutEditor}
-              aria-label="Customize layout size"
-            >
-              <span className="theme-customize-icon" aria-hidden="true">
-                <EditIcon />
-              </span>
-            </button>
-          )}
         </div>
 
-        {isLayoutEditing ? (
-          <div className="layout-custom-editor">
-            <MapDimensionFields
-              form={form}
-              minPosterCm={minPosterCm}
-              maxPosterCm={maxPosterCm}
-              onChange={onChange}
-              onNumericFieldBlur={onNumericFieldBlur}
-              showDistanceField={false}
-            />
-          </div>
-        ) : (
-          <div className="layout-inline-groups" ref={layoutGroupsRef}>
-            {layoutGroups.map((group) => (
-              <section key={group.id} className="layout-inline-group">
-                <h3>{group.name}</h3>
-                <div className="layout-inline-list card-scroll-list">
-                  {group.options.map((layoutOption) => (
-                    <LayoutCard
-                      key={layoutOption.id}
-                      layoutOption={layoutOption}
-                      isSelected={layoutOption.id === form.layout}
-                      onClick={() => handleLayoutSelectInline(layoutOption.id)}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        )}
+        <div className="layout-inline-groups" ref={layoutGroupsRef}>
+          {layoutGroups.map((group) => (
+            <section key={group.id} className="layout-inline-group">
+              <h3>{group.name}</h3>
+              <div className="layout-inline-list card-scroll-list">
+                {group.options.map((layoutOption) => (
+                  <LayoutCard
+                    key={layoutOption.id}
+                    layoutOption={layoutOption}
+                    isSelected={layoutOption.id === form.layout}
+                    onClick={() => handleLayoutSelectInline(layoutOption.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
     </section>
   );

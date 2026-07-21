@@ -7,8 +7,10 @@ import { useLegalDoc } from "@/features/legal/application/useLegalDoc";
 import type { LegalDocType } from "@/features/legal/application/legalDoc";
 
 const TITLES: Record<LegalDocType, string> = {
-  privacy: "Privacy Policy",
-  imprint: "Imprint",
+  privacy: "Política de Privacidad",
+  imprint: "Aviso Legal",
+  terms: "Condiciones de Venta",
+  withdrawal: "Política de Desistimiento",
 };
 
 interface LegalModalProps {
@@ -37,10 +39,10 @@ export default function LegalModal({ doc, onClose }: LegalModalProps) {
           <CloseIcon />
         </button>
         <div className="legal-modal__body">
-          {loading && <p className="legal-modal__status">Loading…</p>}
+          {loading && <p className="legal-modal__status">Cargando…</p>}
           {error && (
             <p className="legal-modal__status">
-              Couldn't load this document — please try again later.
+              No se pudo cargar este documento — inténtalo de nuevo más tarde.
             </p>
           )}
           {text && (

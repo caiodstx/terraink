@@ -3,6 +3,7 @@ import { usePosterContext } from "@/features/poster/ui/PosterContext";
 import { localStorageCache } from "@/core/cache/localStorageCache";
 import type { ExportFormat } from "@/features/export/domain/types";
 import { captureMapAsCanvas } from "@/features/export/infrastructure/mapExporter";
+import { applyPreviewWatermark } from "@/features/export/infrastructure/previewWatermark";
 import { compositeExport } from "@/features/poster/infrastructure/renderer";
 import { resolveCanvasSize } from "@/features/poster/infrastructure/renderer/canvas";
 import { getAllMarkerIcons } from "@/features/markers/infrastructure/iconRegistry";
@@ -20,6 +21,18 @@ import {
   DEFAULT_POSTER_HEIGHT_CM,
 } from "@/core/config";
 import { trackEvent, setUserProperty } from "@/core/services";
+
+// Free preview: low enough that it's useless as a print file, still clear
+// enough to judge the design. Purchases always render at full 300dpi.
+const PREVIEW_DPI = 72;
+const PURCHASE_DPI = 300;
+
+export interface ExportRunOptions {
+  /** Default true — set false to get the Blob back without saving it to disk. */
+  download?: boolean;
+  /** Default false — forces PNG at PREVIEW_DPI with a watermark. */
+  preview?: boolean;
+}
 
 const EXPORT_COUNT_STORAGE_KEY = "mapagrama.poster.count";
 
@@ -100,11 +113,18 @@ export function useExport() {
   }, []);
 
   const exportPoster = useCallback(
-    async (format: ExportFormat) => {
+    async (
+      format: ExportFormat,
+      options?: ExportRunOptions,
+    ): Promise<Blob | null> => {
+      const isPreview = options?.preview ?? false;
+      const shouldDownload = options?.download ?? true;
+      const effectiveFormat: ExportFormat = isPreview ? "png" : format;
+
       const map = mapRef.current;
       if (!map) {
         dispatch({ type: "SET_ERROR", error: "Map is not ready." });
-        return;
+        return null;
       }
 
       dispatch({ type: "SET_EXPORT_STATUS", exporting: true });
@@ -117,19 +137,22 @@ export function useExport() {
 
         const widthCm = Number(form.width) || DEFAULT_POSTER_WIDTH_CM;
         const heightCm = Number(form.height) || DEFAULT_POSTER_HEIGHT_CM;
-        const dpi = 300;
+        const dpi = isPreview ? PREVIEW_DPI : PURCHASE_DPI;
         const widthInches = widthCm / CM_PER_INCH;
         const heightInches = heightCm / CM_PER_INCH;
 
         // Aggregate, non-personal export data. Use only the structured city /
-        // country — never raw input (form.location) or coordinates.
+        // country — never raw input (form.location) or coordinates. Only
+        // free previews feed the lifetime export counter — purchases are
+        // tracked separately by the checkout flow, with their own context
+        // (variant, price) that this hook doesn't know about.
         const nextCount = readPosterExportCount() + 1;
         const secondsBetweenExports =
           lastExportAt !== null
             ? Math.round((Date.now() - lastExportAt) / 1000)
             : null;
         const exportParams = {
-          format,
+          format: effectiveFormat,
           poster_city: form.displayCity.trim() || "unknown",
           poster_country: form.displayCountry.trim() || "unknown",
           theme: form.theme,
@@ -143,12 +166,12 @@ export function useExport() {
             : {}),
         };
 
-        const size = resolveCanvasSize(widthInches, heightInches);
+        const size = resolveCanvasSize(widthInches, heightInches, dpi);
 
         const lat = Number(form.latitude) || 0;
         const lon = Number(form.longitude) || 0;
 
-        if (format === "svg") {
+        if (effectiveFormat === "svg") {
           const svgBlob = await createLayeredSvgBlobFromMap({
             map,
             exportWidth: size.width,
@@ -167,16 +190,20 @@ export function useExport() {
               : [],
             routes: visibleRoutes,
           });
-          const svgFilename = createPosterFilename(
-            form.displayCity || form.location,
-            form.theme,
-            "svg",
-          );
-          await triggerDownloadBlob(svgBlob, svgFilename);
-          reportExportSuccess(nextCount, exportParams);
-          registerSuccessfulExport(nextCount);
+          if (shouldDownload) {
+            const svgFilename = createPosterFilename(
+              form.displayCity || form.location,
+              form.theme,
+              "svg",
+            );
+            await triggerDownloadBlob(svgBlob, svgFilename);
+          }
+          if (isPreview) {
+            reportExportSuccess(nextCount, exportParams);
+            registerSuccessfulExport(nextCount);
+          }
           dispatch({ type: "SET_EXPORT_STATUS", exporting: false });
-          return;
+          return svgBlob;
         }
 
         // 1. Capture map at full export resolution
@@ -211,31 +238,38 @@ export function useExport() {
           routes: visibleRoutes,
         });
 
-        // 3. Download
+        if (isPreview) {
+          applyPreviewWatermark(canvas);
+        }
+
+        // 3. Build the blob (and download it, unless this is a purchase run)
         const filename = createPosterFilename(
           form.displayCity || form.location,
           form.theme,
-          format,
+          effectiveFormat,
         );
 
-        if (format === "pdf") {
-          const pdfBlob = createPdfBlobFromCanvas(canvas, {
-            widthCm,
-            heightCm,
-          });
-          await triggerDownloadBlob(pdfBlob, filename);
+        let blob: Blob;
+        if (effectiveFormat === "pdf") {
+          blob = createPdfBlobFromCanvas(canvas, { widthCm, heightCm });
         } else {
-          const pngBlob = await createPngBlob(canvas, dpi);
-          await triggerDownloadBlob(pngBlob, filename);
+          blob = await createPngBlob(canvas, dpi);
+        }
+        if (shouldDownload) {
+          await triggerDownloadBlob(blob, filename);
         }
 
-        reportExportSuccess(nextCount, exportParams);
-        registerSuccessfulExport(nextCount);
+        if (isPreview) {
+          reportExportSuccess(nextCount, exportParams);
+          registerSuccessfulExport(nextCount);
+        }
         dispatch({ type: "SET_EXPORT_STATUS", exporting: false });
+        return blob;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Export failed.";
-        trackEvent("export_failed", { format, reason: message });
+        trackEvent("export_failed", { format: effectiveFormat, reason: message });
         dispatch({ type: "SET_EXPORT_STATUS", exporting: false, error: message });
+        return null;
       }
     },
     [
@@ -252,26 +286,18 @@ export function useExport() {
     ],
   );
 
-  const handleDownloadPng = useCallback(
-    () => exportPoster("png"),
-    [exportPoster],
-  );
-
-  const handleDownloadPdf = useCallback(
-    () => exportPoster("pdf"),
-    [exportPoster],
-  );
-
-  const handleDownloadSvg = useCallback(
-    () => exportPoster("svg"),
+  // Free path: low-res, watermarked, PNG only — full-quality PDF/SVG are no
+  // longer given away for free (see previewWatermark.ts / decision log in
+  // the Fase 3 plan). Paid exports go through exportPoster("png", { preview:
+  // false, download: false }) directly from the checkout flow instead.
+  const exportPreview = useCallback(
+    () => exportPoster("png", { preview: true }),
     [exportPoster],
   );
 
   return {
     isExporting: state.isExporting,
     exportPoster,
-    handleDownloadPng,
-    handleDownloadPdf,
-    handleDownloadSvg,
+    exportPreview,
   };
 }

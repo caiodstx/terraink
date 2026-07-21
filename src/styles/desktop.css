@@ -851,11 +851,13 @@
   }
 
   .mobile-location-row-wrap,
-  .mobile-export-fab-trigger {
+  .mobile-export-fab-trigger,
+  .mobile-buy-fab-trigger {
     display: none !important;
   }
 
-  .export-fab-trigger-desktop {
+  .export-fab-trigger-desktop,
+  .buy-fab-trigger-desktop {
     display: inline-flex;
   }
 

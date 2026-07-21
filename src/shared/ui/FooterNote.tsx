@@ -3,6 +3,8 @@
   CONTACT_EMAIL,
   LEGAL_NOTICE_URL,
   PRIVACY_URL,
+  TERMS_URL,
+  WITHDRAWAL_URL,
 } from "@/core/config";
 import { InfoIcon } from "@/shared/ui/Icons";
 import { openLegalDoc } from "@/features/legal/application/legalDoc";
@@ -18,10 +20,20 @@ export default function FooterNote() {
   const appVersion = APP_VERSION;
   const contactEmail = String(CONTACT_EMAIL ?? "").trim();
   // These vars hold the raw markdown URLs; the links open the in-app modal.
-  const imprintAvailable = Boolean(String(LEGAL_NOTICE_URL ?? "").trim());
-  const privacyAvailable = Boolean(String(PRIVACY_URL ?? "").trim());
-  const hasLegalLinks = Boolean(
-    contactEmail || imprintAvailable || privacyAvailable,
+  const legalDocLinks: { label: string; doc: "imprint" | "privacy" | "terms" | "withdrawal" }[] = [
+    { label: "Aviso Legal", doc: "imprint" },
+    { label: "Privacidad", doc: "privacy" },
+    { label: "Condiciones de Venta", doc: "terms" },
+    { label: "Desistimiento", doc: "withdrawal" },
+  ];
+  const docUrlAvailable: Record<string, boolean> = {
+    imprint: Boolean(String(LEGAL_NOTICE_URL ?? "").trim()),
+    privacy: Boolean(String(PRIVACY_URL ?? "").trim()),
+    terms: Boolean(String(TERMS_URL ?? "").trim()),
+    withdrawal: Boolean(String(WITHDRAWAL_URL ?? "").trim()),
+  };
+  const availableLegalLinks = legalDocLinks.filter(
+    ({ doc }) => docUrlAvailable[doc],
   );
 
   return (
@@ -33,33 +45,24 @@ export default function FooterNote() {
               {contactEmail}
             </a>
           )}
-          {contactEmail && (imprintAvailable || privacyAvailable) && " | "}
-          {imprintAvailable && (
-            <button
-              type="button"
-              className="source-link"
-              onClick={() => openLegalDoc("imprint")}
-            >
-              Imprint
-            </button>
-          )}
-          {imprintAvailable && privacyAvailable && " | "}
-          {privacyAvailable && (
-            <button
-              type="button"
-              className="source-link"
-              onClick={() => openLegalDoc("privacy")}
-            >
-              Data Privacy
-            </button>
-          )}
-          {hasLegalLinks && " | "}
+          {contactEmail && " | "}
+          {availableLegalLinks.map(({ label, doc }) => (
+            <span key={doc}>
+              <button
+                type="button"
+                className="source-link"
+                onClick={() => openLegalDoc(doc)}
+              >
+                {label}
+              </button>{" | "}
+            </span>
+          ))}
           <button
             type="button"
             className="source-link"
             onClick={handleCookieSettings}
           >
-            Cookie Settings
+            Configuración de cookies
           </button>
         </p>
       </div>

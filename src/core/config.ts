@@ -4,7 +4,8 @@
 export const CM_PER_INCH = 2.54;
 
 export const MIN_POSTER_CM = 4;
-export const MAX_POSTER_CM = 45;
+// 70cm covers the 50x70cm print size — the largest sellable poster.
+export const MAX_POSTER_CM = 70;
 export const DEFAULT_POSTER_WIDTH_CM = 20;
 export const DEFAULT_POSTER_HEIGHT_CM = 30;
 export const LAYOUT_MATCH_TOLERANCE_CM = 0.01;
@@ -40,10 +41,21 @@ export const DEFAULT_CITY = "Hanover";
 export const DEFAULT_COUNTRY = "Germany";
 
 export const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? "";
-/* Raw markdown URLs (e.g. raw.githubusercontent.com) for the in-app legal
-   modal — imprint and privacy docs pulled from the meta repo. */
+
+/* Base URL of mapagrama-api (private, separate repo/process — see its own
+   CLAUDE.md). Defaults to "/api" to match the production nginx reverse
+   proxy, which strips the prefix before forwarding. Override for local
+   dev against a `bun run dev` instance of mapagrama-api. */
+export const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ?? "/api"
+).replace(/\/$/, "");
+/* Raw markdown URLs for the in-app legal modal. Hosted as static files on
+   the R2 public bucket already used for design storage (mapagrama-api),
+   under the "legal/" prefix — not tied to any release of this app. */
 export const LEGAL_NOTICE_URL = import.meta.env.VITE_LEGAL_NOTICE_URL ?? "";
 export const PRIVACY_URL = import.meta.env.VITE_PRIVACY_URL ?? "";
+export const TERMS_URL = import.meta.env.VITE_TERMS_URL ?? "";
+export const WITHDRAWAL_URL = import.meta.env.VITE_WITHDRAWAL_URL ?? "";
 
 export const APP_CREDIT_URL =
   import.meta.env.VITE_APP_CREDIT_URL ?? "mapagrama.com";

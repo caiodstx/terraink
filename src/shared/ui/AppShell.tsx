@@ -25,6 +25,8 @@ const AnnouncementModal = lazy(
   () => import("@/features/updates/ui/AnnouncementModal"),
 );
 const ExportFab = lazy(() => import("@/features/export/ui/ExportFab"));
+const BuyFab = lazy(() => import("@/features/checkout/ui/BuyFab"));
+const BuyModal = lazy(() => import("@/features/checkout/ui/BuyModal"));
 const DesktopLocationBar = lazy(() => import("@/shared/ui/DesktopLocationBar"));
 
 function SettingsDrawer({
@@ -89,6 +91,7 @@ export default function AppShell() {
   const [desktopLocationRowVisible, setDesktopLocationRowVisible] =
     useState(true);
   const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -103,6 +106,8 @@ export default function AppShell() {
       void import("@/features/poster/ui/SettingsPanel");
       void import("@/shared/ui/DesktopLocationBar");
       void import("@/features/export/ui/ExportFab");
+      void import("@/features/checkout/ui/BuyFab");
+      void import("@/features/checkout/ui/BuyModal");
       void import("@/features/updates/ui/AnnouncementModal");
     };
 
@@ -296,6 +301,17 @@ export default function AppShell() {
       <Suspense fallback={null}>
         <ExportFab isMobile={isMobileViewport} />
       </Suspense>
+      <Suspense fallback={null}>
+        <BuyFab
+          isMobile={isMobileViewport}
+          onClick={() => setIsBuyModalOpen(true)}
+        />
+      </Suspense>
+      {isBuyModalOpen ? (
+        <Suspense fallback={null}>
+          <BuyModal open onClose={() => setIsBuyModalOpen(false)} />
+        </Suspense>
+      ) : null}
 
       <FooterNote />
       <Suspense fallback={null}>

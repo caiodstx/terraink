@@ -1,4 +1,4 @@
-import type { IHttp } from "./ports";
+import type { HttpBody, IHttp } from "./ports";
 
 async function fetchWithTimeout(
   url: string,
@@ -36,7 +36,7 @@ export const fetchAdapter: IHttp = {
 
   post(
     url: string,
-    body: string,
+    body: HttpBody,
     options: RequestInit = {},
     timeoutMs = 20_000,
   ): Promise<Response> {

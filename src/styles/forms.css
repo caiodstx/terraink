@@ -1320,6 +1320,72 @@ button.picker-modal-done:focus-visible {
   background: rgba(47, 79, 102, 0.95);
 }
 
+/* ── Buy modal ── */
+
+.buy-modal-body {
+  display: grid;
+  gap: 12px;
+}
+
+.buy-modal-size {
+  margin: 0;
+  font-size: 0.86rem;
+  color: rgba(214, 234, 247, 0.82);
+}
+
+.buy-modal-kind-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.buy-modal-kind-btn {
+  height: 40px;
+  border: 1px solid rgba(151, 183, 207, 0.42);
+  border-radius: 10px;
+  background: var(--item-bg);
+  color: rgba(214, 234, 247, 0.86);
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.buy-modal-kind-btn.is-selected {
+  background: rgba(231, 242, 250, 0.96);
+  border-color: rgba(165, 198, 221, 0.6);
+  color: #0d1f2e;
+}
+
+.buy-modal-status {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(214, 234, 247, 0.7);
+}
+
+.buy-modal-error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #ff9b8a;
+}
+
+.buy-modal-cta {
+  height: 48px;
+  border: 1px solid rgba(165, 198, 221, 0.34);
+  border-radius: 12px;
+  background: rgba(231, 242, 250, 0.96);
+  color: #0d1f2e;
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.buy-modal-cta:disabled {
+  opacity: 0.55;
+}
+
 .palette-editor-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

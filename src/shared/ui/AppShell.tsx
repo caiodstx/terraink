@@ -22,6 +22,9 @@ const ExportFab = lazy(() => import("@/features/export/ui/ExportFab"));
 const BuyFab = lazy(() => import("@/features/checkout/ui/BuyFab"));
 const BuyModal = lazy(() => import("@/features/checkout/ui/BuyModal"));
 const DesktopLocationBar = lazy(() => import("@/shared/ui/DesktopLocationBar"));
+const DevExportBridge = import.meta.env.DEV
+  ? lazy(() => import("@/features/export/ui/DevExportBridge"))
+  : null;
 
 function SettingsDrawer({
   mobileTab,
@@ -295,6 +298,11 @@ export default function AppShell() {
       {isBuyModalOpen ? (
         <Suspense fallback={null}>
           <BuyModal open onClose={() => setIsBuyModalOpen(false)} />
+        </Suspense>
+      ) : null}
+      {DevExportBridge ? (
+        <Suspense fallback={null}>
+          <DevExportBridge />
         </Suspense>
       ) : null}
 

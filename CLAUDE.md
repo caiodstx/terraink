@@ -30,10 +30,10 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
   `jack`/`lily.ns.cloudflare.com`) el 2026-07-21. Registrador sigue siendo
   GoDaddy, solo se delegó el DNS.
 - **Correo del dominio:** Zoho Mail no funcionaba — sustituido por
-  **Cloudflare Email Routing** (gratis): `hola@mapagrama.com` reenvía al
-  Gmail personal del fundador. Para enviar *como* `hola@mapagrama.com`
-  desde Gmail hace falta un relay SMTP (pendiente, se puede reusar Resend
-  para esto).
+  **Cloudflare Email Routing** (gratis): `contacto@mapagrama.com` (dirección
+  oficial de cara al cliente — web, legal, etc.) reenvía al Gmail personal
+  del fundador. Para enviar *como* `contacto@mapagrama.com` desde Gmail
+  hace falta un relay SMTP (pendiente, se puede reusar Resend para esto).
 - **Emails transaccionales:** Resend, dominio verificado (DKIM vía la
   integración automática Resend↔Cloudflare, sin tocar el MX raíz que usa
   Email Routing). Remitente: `orders@mapagrama.com`.

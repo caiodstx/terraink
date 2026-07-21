@@ -138,15 +138,32 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       la Product Catalog API y `orders:quote` de la cuenta real (ver tabla
       de precios arriba). Catálogo ampliado a 8 variantes (2 pósteres +
       3 colores de marco × 2 tamaños).
-- [ ] Sandbox: Stripe test mode — sin probar aún end-to-end. La parte
-      Gelato ya no está bloqueada (cuenta activa, API key en `.env` local
-      de `mapagrama-api`, no commiteada), pero falta probar una creación
-      de pedido real (o en su sandbox) end-to-end.
-- [ ] Verificar el shape exacto del payload de creación de pedido de
-      Gelato (`POST /v4/orders`, distinto de `orders:quote` que ya se usó
-      para validar precios/producción) antes de aceptar pedidos reales —
-      `mapagrama-api/src/lib/gelato.ts` tiene la implementación actual sin
-      probar contra un pedido real.
+- [x] Probado con eventos firmados reales (Stripe test mode) contra el
+      servidor corriendo: `POST /checkout` crea sesión real; el webhook
+      verifica firma, idempotencia y parseo de metadata correctamente.
+      Encontrados y arreglados 2 bugs reales en el proceso: (1) Bun usa el
+      proveedor SubtleCrypto, así que `constructEvent` síncrono siempre
+      fallaba — cambiado a `constructEventAsync`; (2) el chequeo de
+      idempotencia se saltaba pedidos a medio terminar tras un fallo
+      transitorio (p.ej. R2 caído) en vez de reintentar — ahora solo se da
+      por completado cuando `gelato_order_id` está seteado.
+- [x] R2 probado con credenciales reales: upload, URL pública, movido
+      `pending/` → `purchased/`, borrado del original. Todo OK.
+- [x] Creación real de pedido en Gelato (`POST /v4/orders`) probada con un
+      pedido real de verdad (póster 30x40, dirección real, 2026-07-21) —
+      el shape de `mapagrama-api/src/lib/gelato.ts` era correcto sin
+      cambios. Pedido `5770a0ab-51c0-402f-a953-b56da7ce27fa`, producción
+      España, entrega estimada 27-28 julio 2026. Requiere tener la
+      "company information" completa en el portal de Gelato (Settings) o
+      la API rechaza el pedido con 400 antes de cobrar nada — ya
+      completada.
+- [x] **Confirmado: el 30% de descuento del primer pedido se aplica
+      automáticamente vía API**, sin código promo en el payload (aparece
+      como `discounts[].title: "txt_first_order_name"` en la respuesta).
+      Precio real del pedido de prueba: 7,90€ − 2,37€ (30%) = 5,53€
+      producto + 7,39€ envío = 12,92€ total.
+- [ ] Sandbox Resend (emails) — sin probar, `RESEND_API_KEY` no
+      configurada todavía (el código simplemente omite el envío si falta).
 - [x] Docker compose: frontend + api + nginx en el VPS. Vive en
       `mapagrama-api/docker-compose.yml` (build contexts `../mapagrama` +
       `.`), con reverse-proxy nginx enrutando `/api/*` al backend y el

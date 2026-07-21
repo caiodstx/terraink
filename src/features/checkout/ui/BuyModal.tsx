@@ -4,8 +4,9 @@ import { usePosterContext } from "@/features/poster/ui/PosterContext";
 import { getLayoutOption } from "@/features/layout/infrastructure/layoutRepository";
 import { useCatalog } from "../application/useCatalog";
 import { useCheckout } from "../application/useCheckout";
+import { useDesignThumbnail } from "../application/useDesignThumbnail";
 import { resolveVariantId } from "../domain/variantResolver";
-import FrameColorCard from "./FrameColorCard";
+import FrameColorCard, { FRAME_COLOR_SWATCH } from "./FrameColorCard";
 import type { FrameColor, PosterKind } from "../domain/types";
 
 const FRAME_COLORS: FrameColor[] = ["natural-wood", "black", "gold"];
@@ -27,6 +28,7 @@ export default function BuyModal({ open, onClose }: BuyModalProps) {
 
   const { variants, isLoading, error: catalogError } = useCatalog(open);
   const { purchase, isProcessing, error: purchaseError } = useCheckout();
+  const thumbnailUrl = useDesignThumbnail(open);
 
   const layoutOption = getLayoutOption(state.form.layout);
 
@@ -45,6 +47,20 @@ export default function BuyModal({ open, onClose }: BuyModalProps) {
   return (
     <PickerModal open={open} title="Comprar póster" onClose={onClose}>
       <div className="buy-modal-body">
+        <div
+          className="buy-modal-mockup"
+          style={{
+            borderColor:
+              kind === "framed" ? FRAME_COLOR_SWATCH[frameColor] : undefined,
+          }}
+        >
+          {thumbnailUrl ? (
+            <img src={thumbnailUrl} alt="Vista previa de tu diseño" />
+          ) : (
+            <span className="buy-modal-mockup-loading">Generando vista previa…</span>
+          )}
+        </div>
+
         <p className="buy-modal-size">
           Tamaño: <strong>{layoutOption?.name ?? state.form.layout}</strong>
         </p>

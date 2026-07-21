@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import FooterNote from "@/shared/ui/FooterNote";
 
-const EXAMPLE_CITIES = ["Gijón", "Oviedo", "Madrid"];
+const EXAMPLE_CITIES = [
+  { city: "Gijón", country: "España · 43.5° N, 5.66° O" },
+  { city: "Oviedo", country: "España · 43.36° N, 5.84° O" },
+  { city: "Madrid", country: "España · 40.42° N, 3.70° O" },
+];
 
 const PRICE_ROWS = [
   { label: "Póster 30x40cm", price: "29€" },
@@ -14,7 +18,10 @@ export default function LandingPage() {
   return (
     <div className="landing-page">
       <header className="landing-header">
-        <img src="/assets/logo.svg" alt="Mapagrama" className="landing-logo" />
+        <div className="landing-brand">
+          <img src="/assets/logo.svg" alt="" className="landing-logo" />
+          <span className="landing-brand-name">Mapagrama</span>
+        </div>
         <Link to="/crear" className="landing-nav-cta">
           Crear mi mapa
         </Link>
@@ -34,10 +41,13 @@ export default function LandingPage() {
       <section className="landing-examples">
         <h2>Algunos ejemplos</h2>
         <div className="landing-examples-grid">
-          {EXAMPLE_CITIES.map((city) => (
+          {EXAMPLE_CITIES.map(({ city, country }) => (
             <div key={city} className="landing-example-card">
               <div className="landing-example-preview" aria-hidden="true" />
-              <p className="landing-example-city">{city}</p>
+              <div className="landing-example-typeblock">
+                <p className="landing-example-city">{city}</p>
+                <p className="landing-example-country">{country}</p>
+              </div>
             </div>
           ))}
         </div>

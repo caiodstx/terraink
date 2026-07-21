@@ -14,7 +14,7 @@ export function useCheckout() {
       setIsProcessing(true);
       setError(null);
       try {
-        const blob = await exportPoster("png", { preview: false, download: false });
+        const blob = await exportPoster("png", { quality: "purchase", download: false });
         if (!blob) {
           throw new Error("No se pudo generar el archivo del póster.");
         }

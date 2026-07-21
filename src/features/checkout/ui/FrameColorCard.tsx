@@ -1,6 +1,6 @@
 import type { FrameColor } from "../domain/types";
 
-const FRAME_COLOR_SWATCH: Record<FrameColor, string> = {
+export const FRAME_COLOR_SWATCH: Record<FrameColor, string> = {
   "natural-wood": "#c9a26b",
   black: "#1a1a1a",
   gold: "#c9a227",

@@ -22,16 +22,24 @@ import {
 } from "@/core/config";
 import { trackEvent, setUserProperty } from "@/core/services";
 
-// Free preview: low enough that it's useless as a print file, still clear
-// enough to judge the design. Purchases always render at full 300dpi.
-const PREVIEW_DPI = 72;
+// Free preview / in-modal thumbnail: low enough that it's useless as a
+// print file, still clear enough to judge the design. Purchases always
+// render at full 300dpi.
+const LOW_DPI = 72;
 const PURCHASE_DPI = 300;
+
+export type ExportQuality = "purchase" | "preview" | "thumbnail";
 
 export interface ExportRunOptions {
   /** Default true — set false to get the Blob back without saving it to disk. */
   download?: boolean;
-  /** Default false — forces PNG at PREVIEW_DPI with a watermark. */
-  preview?: boolean;
+  /**
+   * Default "purchase" (full 300dpi, requested format, no watermark).
+   * "preview" forces PNG at LOW_DPI with a watermark (the free download).
+   * "thumbnail" forces PNG at LOW_DPI with NO watermark (e.g. the frame
+   * mockup in the buy modal — not meant to be saved/downloaded).
+   */
+  quality?: ExportQuality;
 }
 
 const EXPORT_COUNT_STORAGE_KEY = "mapagrama.poster.count";
@@ -117,9 +125,14 @@ export function useExport() {
       format: ExportFormat,
       options?: ExportRunOptions,
     ): Promise<Blob | null> => {
-      const isPreview = options?.preview ?? false;
+      const quality = options?.quality ?? "purchase";
       const shouldDownload = options?.download ?? true;
-      const effectiveFormat: ExportFormat = isPreview ? "png" : format;
+      const effectiveFormat: ExportFormat = quality === "purchase" ? format : "png";
+      const shouldWatermark = quality === "preview";
+      // Only the free preview counts toward the lifetime download counter —
+      // thumbnails are silent UI chrome, purchases are tracked separately
+      // by the checkout flow (with variant/price context this hook lacks).
+      const countsAsFreePreview = quality === "preview";
 
       const map = mapRef.current;
       if (!map) {
@@ -137,7 +150,7 @@ export function useExport() {
 
         const widthCm = Number(form.width) || DEFAULT_POSTER_WIDTH_CM;
         const heightCm = Number(form.height) || DEFAULT_POSTER_HEIGHT_CM;
-        const dpi = isPreview ? PREVIEW_DPI : PURCHASE_DPI;
+        const dpi = quality === "purchase" ? PURCHASE_DPI : LOW_DPI;
         const widthInches = widthCm / CM_PER_INCH;
         const heightInches = heightCm / CM_PER_INCH;
 
@@ -198,7 +211,7 @@ export function useExport() {
             );
             await triggerDownloadBlob(svgBlob, svgFilename);
           }
-          if (isPreview) {
+          if (countsAsFreePreview) {
             reportExportSuccess(nextCount, exportParams);
             registerSuccessfulExport(nextCount);
           }
@@ -238,7 +251,7 @@ export function useExport() {
           routes: visibleRoutes,
         });
 
-        if (isPreview) {
+        if (shouldWatermark) {
           applyPreviewWatermark(canvas);
         }
 
@@ -259,7 +272,7 @@ export function useExport() {
           await triggerDownloadBlob(blob, filename);
         }
 
-        if (isPreview) {
+        if (countsAsFreePreview) {
           reportExportSuccess(nextCount, exportParams);
           registerSuccessfulExport(nextCount);
         }
@@ -291,7 +304,7 @@ export function useExport() {
   // the Fase 3 plan). Paid exports go through exportPoster("png", { preview:
   // false, download: false }) directly from the checkout flow instead.
   const exportPreview = useCallback(
-    () => exportPoster("png", { preview: true }),
+    () => exportPoster("png", { quality: "preview" }),
     [exportPoster],
   );
 

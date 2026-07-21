@@ -13,13 +13,7 @@ import { useSwipeDown } from "@/shared/hooks/useSwipeDown";
 import StartupLocationModal from "@/features/location/ui/StartupLocationModal";
 import { CheckIcon } from "@/shared/ui/Icons";
 import { useSessionAnalytics } from "@/features/export/application/useSessionAnalytics";
-import {
-  LEGAL_DOC_EVENT,
-  type LegalDocDetail,
-  type LegalDocType,
-} from "@/features/legal/application/legalDoc";
 
-const LegalModal = lazy(() => import("@/features/legal/ui/LegalModal"));
 const SettingsPanel = lazy(() => import("@/features/poster/ui/SettingsPanel"));
 const AnnouncementModal = lazy(
   () => import("@/features/updates/ui/AnnouncementModal"),
@@ -90,16 +84,7 @@ export default function AppShell() {
   const [desktopPanelOpen, setDesktopPanelOpen] = useState(false);
   const [desktopLocationRowVisible, setDesktopLocationRowVisible] =
     useState(true);
-  const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      setLegalDoc((e as CustomEvent<LegalDocDetail>).detail.doc);
-    };
-    window.addEventListener(LEGAL_DOC_EVENT, handler);
-    return () => window.removeEventListener(LEGAL_DOC_EVENT, handler);
-  }, []);
 
   useEffect(() => {
     const preload = () => {
@@ -317,11 +302,6 @@ export default function AppShell() {
       <Suspense fallback={null}>
         <AnnouncementModal />
       </Suspense>
-      {legalDoc ? (
-        <Suspense fallback={null}>
-          <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
-        </Suspense>
-      ) : null}
     </div>
   );
 }

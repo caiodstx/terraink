@@ -26,9 +26,9 @@
 
 .landing-brand-name {
   font-family: "Spline Sans Mono", monospace;
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   color: var(--ink);
 }
 

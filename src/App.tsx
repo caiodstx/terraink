@@ -4,6 +4,7 @@ import AppShell from "@/shared/ui/AppShell";
 import LandingPage from "@/features/landing/ui/LandingPage";
 import ThankYouPage from "@/features/checkout/ui/ThankYouPage";
 import CancelledPage from "@/features/checkout/ui/CancelledPage";
+import LegalModalHost from "@/features/legal/ui/LegalModalHost";
 
 function Editor() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/pedido/gracias" element={<ThankYouPage />} />
         <Route path="/pedido/cancelado" element={<CancelledPage />} />
       </Routes>
+      <LegalModalHost />
     </BrowserRouter>
   );
 }

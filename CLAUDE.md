@@ -178,18 +178,47 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       integración automática Resend↔Cloudflare, sin tocar el MX raíz que
       usa Cloudflare Email Routing), email de prueba entregado desde
       `orders@mapagrama.com`.
-- [x] Docker compose: frontend + api + nginx en el VPS. Vive en
+- [x] Docker compose: frontend + api + nginx. Vive en
       `mapagrama-api/docker-compose.yml` (build contexts `../mapagrama` +
       `.`), con reverse-proxy nginx enrutando `/api/*` al backend y el
-      resto al frontend. Sin probar en el VPS real todavía.
+      resto al frontend. **Desplegado en el VPS de producción**
+      (Hetzner CX22, Nuremberg, `159.69.93.51`, hardening SSH/UFW/
+      fail2ban aplicado) el 2026-07-21.
 
-### Fase 3 — Capa de tienda
-- [ ] Selector tamaño/papel/marco en el flujo del editor con precios.
-- [ ] Página de producto/landing con ejemplos (Gijón, Oviedo, Madrid...).
-- [ ] Emails transaccionales (confirmación, envío) — Resend o SMTP propio.
-- [ ] Legal ES: aviso legal, RGPD, condiciones de venta, desistimiento
-      (nota: producto personalizado = exento de devolución art. 103 LGDCU,
-      indicarlo claramente en checkout).
+### Fase 3 — Capa de tienda ✅ COMPLETA (2026-07-22)
+- [x] Selector tamaño/papel/marco en el flujo del editor con precios.
+      Tamaño bloqueado a 30x40/50x70cm (los únicos vendibles) vía el
+      sistema de layouts existente — WYSIWYG, sin recorte sorpresa al
+      comprar. Nueva feature `src/features/checkout/` con `BuyModal`
+      (póster/enmarcado + color de marco + precio en vivo desde
+      `GET /catalog`) y `BuyFab`.
+- [x] Descarga gratuita convertida en vista previa: PNG, 72dpi, marca de
+      agua ("MAPAGRAMA — VISTA PREVIA"). PDF/SVG ya no son gratis.
+- [x] Página de producto/landing (`/`) con ejemplos (Gijón/Oviedo/Madrid
+      — placeholders visuales, pendiente sustituir por fotos reales del
+      producto), pasos "cómo funciona" y precios. Router añadido
+      (react-router-dom): `/` landing, `/crear` editor, `/pedido/gracias`
+      y `/pedido/cancelado` (las dos últimas ya las usa el backend como
+      redirect de Stripe).
+- [x] Emails transaccionales — ya cubierto por Resend (Fase 2).
+- [x] Legal ES: sistema de `LegalModal` ampliado a 4 documentos (aviso
+      legal, privacidad, condiciones de venta, desistimiento), traducido
+      al español, alojado en `designs.mapagrama.com/legal/*.md` (R2).
+      Contenido real escrito con los datos conocidos del negocio,
+      exención de desistimiento art. 103 LGDCU incluida explícitamente.
+      **Es un borrador de partida, no revisado por un profesional — hay
+      que confirmarlo con un gestor/abogado antes de operar con clientes
+      reales**, especialmente el NIF (dejado como placeholder, no lo
+      tengo).
+- [ ] Pendiente: probar el flujo de compra completo en un navegador real
+      (subida real del blob generado por MapLibre, redirect a Stripe) —
+      solo se ha verificado por API/curl y build limpio en esta sesión,
+      no hay herramienta de navegador disponible para clic a clic.
+- [ ] Pendiente: sustituir las tarjetas de ejemplo de la landing
+      (Gijón/Oviedo/Madrid) por fotos reales del producto impreso o
+      renders reales del editor.
+- [ ] Pendiente: redeploy al VPS de producción con estos cambios (el VPS
+      sigue sirviendo la versión previa a esta sesión).
 
 ### Fase 4 — Lanzamiento
 - [ ] Pedido real end-to-end de prueba.

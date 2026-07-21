@@ -217,8 +217,15 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 - [ ] Pendiente: sustituir las tarjetas de ejemplo de la landing
       (Gijón/Oviedo/Madrid) por fotos reales del producto impreso o
       renders reales del editor.
-- [ ] Pendiente: redeploy al VPS de producción con estos cambios (el VPS
-      sigue sirviendo la versión previa a esta sesión).
+- [x] Desplegado en el VPS de producción (2026-07-22) y verificado en
+      `mapagrama.com` real: `/`, `/crear`, `/pedido/gracias`,
+      `/pedido/cancelado` y `/api/catalog` responden 200.
+      **Hallazgo:** el VPS Hetzner solo tiene ~1.9GB de RAM (no 4GB) y
+      no tenía swap — el build de Docker moría por OOM (`SIGKILL`) al
+      compilar el frontend con el bundle de MapLibre. Añadido un
+      swapfile de 2GB persistente (`/etc/fstab`) como fix; con más
+      código/dependencias futuras puede hacer falta revisar el tamaño
+      del servidor.
 
 ### Fase 4 — Lanzamiento
 - [ ] Pedido real end-to-end de prueba.

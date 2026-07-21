@@ -74,21 +74,34 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 6. Webhooks de Gelato (producción/envío) → emails de estado al cliente.
 7. Job de limpieza: borrar diseños de R2 no comprados a los 30 días.
 
-## Catálogo y precios (validar costes reales con cuenta Gelato)
+## Catálogo y precios (verificado con cuenta Gelato real, 2026-07-21)
 
-| Producto | Coste est. (prod+envío ES) | PVP | Margen bruto |
-|---|---|---|---|
-| Póster 30x40 premium matte | ~9-12€ | 29€ | ~17-19€ |
-| Póster 50x70 | ~13-18€ | 44€ | ~26-30€ |
-| Enmarcado madera 30x40 | ~29-38€ | 59€ | ~21-30€ |
-| Enmarcado madera 50x70 | ~43-57€ | 89€ | ~35-45€ |
+| Producto | Coste real (prod+envío a Madrid) | Producción | PVP | Margen bruto |
+|---|---|---|---|---|
+| Póster 30x40 premium matte | 7,90€ + 7,39-8,87€ envío ≈ 15,29-16,77€ | 🇪🇸 España | 29€ | ~12-14€ |
+| Póster 50x70 | 18,37€ + 7,39-8,87€ envío ≈ 25,76-27,24€ | 🇪🇸 España | 44€ | ~17-18€ |
+| Enmarcado 30x40 (madera natural / negro / dorado) | 21,58€ + 6,63-7,96€ envío ≈ 28,21-29,54€ | 🇪🇸 España | 59€ | ~29-31€ |
+| Enmarcado 50x70 (cualquier color/material) | 41,99€ + 19,30-30,99€ envío ≈ 61,29-72,98€ | 🇩🇪 Alemania | 89€ | ~16-28€ |
 
-- Papel: Premium Matte 200gsm (best-seller de Gelato).
-- Formatos con ratio consistente cm/pulgadas: 30x40, 50x70, 70x100.
-- El margen fuerte está en enmarcados — empujarlos en la UI.
-- Restar comisión Stripe (~1,4% + 0,25€) y considerar IVA.
-- OJO: verificar que el enmarcado 50x70 se produce en España (no Alemania)
-  o el envío se come el margen.
+- Papel: `200-gsm-uncoated` en la API de Gelato — su acabado "Premium Matte".
+- Formatos: 30x40 y 50x70cm (ratio cm, no pulgadas — ojo con
+  `UnifiedPaperFormat` de Gelato, que tiene tallas "30x40 inch" = 75x100cm
+  bajo un nombre parecido).
+- El margen fuerte está en enmarcados 30x40 — empujarlos en la UI.
+- Restar comisión Stripe (~1,4% + 0,25€) y considerar IVA sobre estos
+  márgenes.
+- **Confirmado con `orders:quote` de la Gelato Order API:** el enmarcado
+  50x70 SIEMPRE se produce en Alemania (probado con madera natural/oscura
+  y aluminio en los 5 colores) — no es un problema de color, es el
+  tamaño. El 30x40 SÍ produce en España, pero solo en madera natural,
+  aluminio negro o aluminio dorado (aluminio plateado/cobre y madera
+  oscura también salen de Alemania a ese tamaño). Decisión: se mantiene
+  el 50x70 enmarcado con el margen real más bajo (~16-28€ en vez de los
+  ~35-45€ estimados originalmente) en vez de subir precio o retirarlo.
+- Product UIDs reales ya cargados en `mapagrama-api/src/catalog.ts`
+  (repo privado). El catálogo ahora ofrece 3 colores de marco a cada
+  tamaño (natural-wood/black/gold), todos al mismo precio ya que el
+  coste de Gelato no varía por color dentro de un mismo tamaño.
 
 ## Fases de desarrollo
 
@@ -117,11 +130,27 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       → repo público en caiodstx/terraink.
 
 ### Fase 2 — Backend de pedidos
-- [ ] API: `POST /designs` (upload a R2), `POST /checkout` (Stripe),
-      webhook Stripe → pedido Gelato, webhooks Gelato → emails.
-- [ ] Repo separado y privado. Sin código derivado de terraink.
-- [ ] Sandbox: Stripe test mode + Gelato tiene entorno de pruebas.
-- [ ] Docker compose: frontend + api + nginx en el VPS.
+- [x] API: `POST /designs` (upload a R2), `POST /checkout` (Stripe),
+      webhook Stripe → pedido Gelato, webhooks Gelato → emails. Repo
+      `mapagrama-api` (Bun + Hono), hermano de este en `../mapagrama-api`.
+- [x] Repo separado y privado. Sin código derivado de terraink.
+- [x] `gelatoProductUid` reales cargados en `catalog.ts`, verificados con
+      la Product Catalog API y `orders:quote` de la cuenta real (ver tabla
+      de precios arriba). Catálogo ampliado a 8 variantes (2 pósteres +
+      3 colores de marco × 2 tamaños).
+- [ ] Sandbox: Stripe test mode — sin probar aún end-to-end. La parte
+      Gelato ya no está bloqueada (cuenta activa, API key en `.env` local
+      de `mapagrama-api`, no commiteada), pero falta probar una creación
+      de pedido real (o en su sandbox) end-to-end.
+- [ ] Verificar el shape exacto del payload de creación de pedido de
+      Gelato (`POST /v4/orders`, distinto de `orders:quote` que ya se usó
+      para validar precios/producción) antes de aceptar pedidos reales —
+      `mapagrama-api/src/lib/gelato.ts` tiene la implementación actual sin
+      probar contra un pedido real.
+- [x] Docker compose: frontend + api + nginx en el VPS. Vive en
+      `mapagrama-api/docker-compose.yml` (build contexts `../mapagrama` +
+      `.`), con reverse-proxy nginx enrutando `/api/*` al backend y el
+      resto al frontend. Sin probar en el VPS real todavía.
 
 ### Fase 3 — Capa de tienda
 - [ ] Selector tamaño/papel/marco en el flujo del editor con precios.

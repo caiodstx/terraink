@@ -22,9 +22,21 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
   para upload del diseño exportado, checkout y webhooks.
 - **Pagos:** Stripe Checkout.
 - **POD:** Gelato API (producción local en España, sin cuota mensual).
-- **Storage de diseños:** S3-compatible (Cloudflare R2 recomendado, tier
-  gratuito) para guardar el PDF/PNG exportado hasta que Gelato lo recoja.
+- **Storage de diseños:** S3-compatible (Cloudflare R2, tier gratuito)
+  para guardar el PDF/PNG exportado hasta que Gelato lo recoja. Dominio
+  propio conectado: `designs.mapagrama.com`.
 - **Hosting:** VPS propio con Docker (frontend estático + API + nginx).
+- **DNS/dominio:** `mapagrama.com` migrado a Cloudflare (nameservers
+  `jack`/`lily.ns.cloudflare.com`) el 2026-07-21. Registrador sigue siendo
+  GoDaddy, solo se delegó el DNS.
+- **Correo del dominio:** Zoho Mail no funcionaba — sustituido por
+  **Cloudflare Email Routing** (gratis): `hola@mapagrama.com` reenvía al
+  Gmail personal del fundador. Para enviar *como* `hola@mapagrama.com`
+  desde Gmail hace falta un relay SMTP (pendiente, se puede reusar Resend
+  para esto).
+- **Emails transaccionales:** Resend, dominio verificado (DKIM vía la
+  integración automática Resend↔Cloudflare, sin tocar el MX raíz que usa
+  Email Routing). Remitente: `orders@mapagrama.com`.
 
 ## Restricciones legales — NO NEGOCIABLES
 
@@ -162,8 +174,10 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       como `discounts[].title: "txt_first_order_name"` en la respuesta).
       Precio real del pedido de prueba: 7,90€ − 2,37€ (30%) = 5,53€
       producto + 7,39€ envío = 12,92€ total.
-- [ ] Sandbox Resend (emails) — sin probar, `RESEND_API_KEY` no
-      configurada todavía (el código simplemente omite el envío si falta).
+- [x] Resend probado real: dominio `mapagrama.com` verificado (DKIM vía
+      integración automática Resend↔Cloudflare, sin tocar el MX raíz que
+      usa Cloudflare Email Routing), email de prueba entregado desde
+      `orders@mapagrama.com`.
 - [x] Docker compose: frontend + api + nginx en el VPS. Vive en
       `mapagrama-api/docker-compose.yml` (build contexts `../mapagrama` +
       `.`), con reverse-proxy nginx enrutando `/api/*` al backend y el

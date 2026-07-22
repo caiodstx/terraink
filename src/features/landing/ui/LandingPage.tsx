@@ -55,6 +55,21 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="landing-mockups">
+        <h2>En tu pared</h2>
+        <div className="landing-mockups-grid">
+          {EXAMPLE_CITIES.map(({ city, image }) => (
+            <div key={city} className="landing-mockup-card">
+              <img
+                src={`/assets/examples/mockups/${image}.jpg`}
+                alt={`Póster de mapa de ${city} enmarcado en una habitación`}
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="landing-steps">
         <h2>Cómo funciona</h2>
         <ol className="landing-steps-list">

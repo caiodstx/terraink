@@ -80,6 +80,7 @@
 }
 
 .landing-examples h2,
+.landing-mockups h2,
 .landing-steps h2,
 .landing-pricing h2 {
   text-align: center;
@@ -148,6 +149,30 @@
 
 .landing-example-card:hover .landing-example-preview img {
   transform: scale(1.08);
+}
+
+.landing-mockups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.landing-mockup-card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #09121c, #0d1a27 45%, #0a1824 100%);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.landing-mockup-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+}
+
+.landing-mockup-card img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .landing-steps-list {

@@ -210,10 +210,9 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       que confirmarlo con un gestor/abogado antes de operar con clientes
       reales**, especialmente el NIF (dejado como placeholder, no lo
       tengo).
-- [ ] Pendiente: probar el flujo de compra completo en un navegador real
-      (subida real del blob generado por MapLibre, redirect a Stripe) —
-      solo se ha verificado por API/curl y build limpio en esta sesión,
-      no hay herramienta de navegador disponible para clic a clic.
+- [x] Flujo de compra probado clic a clic en navegador real — cubierto por
+      el pedido real end-to-end de Fase 4 (diseño → `BuyModal` → Stripe
+      live → webhook → Gelato).
 - [x] Tarjetas de ejemplo de la landing con fotos reales (Madrid/
       Barcelona/Gijón). Añadida además una segunda sección "En tu pared"
       con mockups del póster enmarcado en una habitación real (generados

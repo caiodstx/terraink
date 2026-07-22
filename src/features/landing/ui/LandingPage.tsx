@@ -134,11 +134,14 @@ export default function LandingPage() {
           {EXAMPLE_CITIES.map(({ city, image }) => (
             <div key={city} className="landing-example-card">
               <div className="landing-example-preview">
-                <img
-                  src={`/assets/examples/${image}.jpg`}
-                  alt={`Póster de mapa de ${city}`}
-                  loading="lazy"
-                />
+                <picture>
+                  <source srcSet={`/assets/examples/${image}.webp`} type="image/webp" />
+                  <img
+                    src={`/assets/examples/${image}.jpg`}
+                    alt={`Póster de mapa de ${city}`}
+                    loading="lazy"
+                  />
+                </picture>
               </div>
             </div>
           ))}
@@ -150,11 +153,14 @@ export default function LandingPage() {
         <div className="landing-mockups-grid">
           {EXAMPLE_CITIES.map(({ city, image }) => (
             <div key={city} className="landing-mockup-card">
-              <img
-                src={`/assets/examples/mockups/${image}.jpg`}
-                alt={`Póster de mapa de ${city} enmarcado en una habitación`}
-                loading="lazy"
-              />
+              <picture>
+                <source srcSet={`/assets/examples/mockups/${image}.webp`} type="image/webp" />
+                <img
+                  src={`/assets/examples/mockups/${image}.jpg`}
+                  alt={`Póster de mapa de ${city} enmarcado en una habitación`}
+                  loading="lazy"
+                />
+              </picture>
             </div>
           ))}
         </div>

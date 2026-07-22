@@ -52,7 +52,10 @@ function pageHtml(city) {
     : `${SITE_URL}/assets/banner.jpg`;
 
   const previewBlock = city.hasExample
-    ? `<img src="/assets/examples/${city.slug}.jpg" alt="Póster de mapa de ${city.name}" loading="lazy" />`
+    ? `<picture>
+        <source srcset="/assets/examples/${city.slug}.webp" type="image/webp" />
+        <img src="/assets/examples/${city.slug}.jpg" alt="Póster de mapa de ${city.name}" loading="lazy" />
+      </picture>`
     : "";
 
   const otherCities = CITIES.filter((c) => c.slug !== city.slug);

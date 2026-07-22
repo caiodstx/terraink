@@ -6,29 +6,8 @@ import {
   DEFAULT_COUNTRY,
 } from "@/core/config";
 import { GEOLOCATION_TIMEOUT_MS } from "@/features/map/infrastructure";
+import { readCityDeepLink } from "@/features/location/infrastructure";
 import type { PosterAction } from "@/features/poster/application/posterReducer";
-
-// Deep link from a city SEO landing page (see
-// scripts/generate-city-pages.mjs's CTA hrefs, e.g. /crear?lat=...&lon=...
-// &city=Valencia&country=Espa%C3%B1a) — takes priority over geolocation:
-// someone clicking "diseñar mi póster de Valencia" wants Valencia, not
-// their GPS position or the Madrid fallback.
-function readCityDeepLink(): {
-  lat: number;
-  lon: number;
-  city: string;
-  country: string;
-} | null {
-  const params = new URLSearchParams(window.location.search);
-  const lat = Number(params.get("lat"));
-  const lon = Number(params.get("lon"));
-  const city = params.get("city");
-  const country = params.get("country");
-  if (!city || !country || !Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return null;
-  }
-  return { lat, lon, city, country };
-}
 
 /**
  * Initializes map start position from a city deep link, then browser

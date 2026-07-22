@@ -44,6 +44,66 @@ const PRICE_ROWS = [
   { label: "Enmarcado 50x70cm", price: "89€" },
 ];
 
+// Kept word-for-word identical to the visible FAQ section below —
+// Google requires FAQPage structured data to match on-page content,
+// not just exist hidden in the JSON-LD.
+const FAQ_ITEMS = [
+  {
+    question: "¿Puedo elegir cualquier ciudad del mundo?",
+    answer:
+      "Sí. El mapa usa datos de OpenStreetMap, así que puedes buscar prácticamente cualquier ciudad, pueblo o lugar del mundo, no solo España.",
+  },
+  {
+    question: "¿Cuánto tarda en llegar mi pedido?",
+    answer:
+      "El póster se imprime bajo pedido en España o la UE una vez confirmado el pago. Verás una estimación de entrega concreta antes de pagar, según el producto y tu dirección.",
+  },
+  {
+    question: "¿Puedo devolver mi pedido si cambio de opinión?",
+    answer:
+      "Al ser un producto personalizado hecho a medida, no aplica el derecho de desistimiento de 14 días (art. 103 LGDCU). Si llega dañado o hay un error de producción, sí está cubierto.",
+  },
+  {
+    question: "¿Qué tamaños y acabados hay disponibles?",
+    answer:
+      "Póster 30x40cm o 50x70cm, sin marco o enmarcado en madera natural, negro o dorado.",
+  },
+  {
+    question: "¿Cómo se paga?",
+    answer:
+      "Con tarjeta u otros métodos a través de Stripe Checkout, de forma segura. El pedido se confirma solo tras confirmarse el pago.",
+  },
+];
+
+const PRODUCT_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: "Póster de mapa personalizado",
+  description:
+    "Póster de mapa de cualquier ciudad, personalizable en colores, capas y texto, impreso y enviado bajo demanda desde España.",
+  image: "https://mapagrama.com/assets/banner.jpg",
+  brand: { "@type": "Brand", name: "Mapagrama" },
+  offers: {
+    "@type": "AggregateOffer",
+    priceCurrency: "EUR",
+    lowPrice: "29",
+    highPrice: "89",
+    offerCount: "4",
+    availability: "https://schema.org/InStock",
+    url: "https://mapagrama.com/crear",
+  },
+};
+
+const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ_ITEMS.map(({ question, answer }) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: { "@type": "Answer", text: answer },
+  })),
+};
+
 export default function LandingPage() {
   return (
     <div className="landing-page">
@@ -144,6 +204,27 @@ export default function LandingPage() {
           Empieza a diseñar
         </Link>
       </section>
+
+      <section className="landing-faq">
+        <h2>Preguntas frecuentes</h2>
+        <dl className="landing-faq-list">
+          {FAQ_ITEMS.map(({ question, answer }) => (
+            <div key={question} className="landing-faq-item">
+              <dt>{question}</dt>
+              <dd>{answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_SCHEMA) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
+      />
 
       <section className="landing-cities">
         <h2>Pósters de mapa por ciudad</h2>

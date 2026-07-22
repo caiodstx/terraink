@@ -106,6 +106,16 @@ function pageHtml(city) {
         }
       }
     </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Mapagrama", "item": "${SITE_URL}/" },
+          { "@type": "ListItem", "position": 2, "name": "Mapa de ${city.name}", "item": "${canonical}" }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div class="seo-page">

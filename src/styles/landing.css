@@ -116,9 +116,38 @@
   border-bottom-color: rgba(201, 162, 39, 0.6);
 }
 
+.landing-faq-list {
+  margin: 0;
+  max-width: 720px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.landing-faq-item {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 22px;
+  background: var(--item-bg);
+}
+
+.landing-faq-item dt {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.landing-faq-item dd {
+  margin: 0;
+  color: rgba(214, 234, 247, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 .landing-examples h2,
 .landing-mockups h2,
 .landing-why h2,
+.landing-faq h2,
 .landing-steps h2,
 .landing-pricing h2 {
   text-align: center;

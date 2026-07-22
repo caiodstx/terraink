@@ -364,8 +364,14 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       variantes usan la foto del póster sin marco en el feed en vez de
       un marco que no existe todavía. Actualizar cuando exista un
       mockup dorado real.
-- [ ] Landings de intención de regalo: /regalo-aniversario,
-      /regalo-pareja, /regalo-mudanza (enlazadas desde landing y footer).
+- [x] Landings de intención de regalo (2026-07-22): /regalo-aniversario,
+      /regalo-pareja, /regalo-mudanza — mismo patrón HTML estático que
+      las páginas de ciudad (no rutas SPA), contenido propio por
+      ocasión (no una plantilla con una palabra cambiada), en
+      `src/data/giftIntents.ts`. Enlazadas desde una sección nueva en
+      la landing (no en el footer global — ese footer compartido
+      también aparece dentro del editor de pago, donde estos enlaces
+      no pintan nada) y entre sí.
 - [ ] Pinterest Business: cuenta verificada con el dominio, pin por
       ciudad/tema de color, rich pins de producto.
 - [x] Técnico (2026-07-22): cache-control 1h en `/mapa/*` (nginx.conf —

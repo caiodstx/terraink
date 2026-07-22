@@ -10,7 +10,7 @@
 // stay in sync automatically). Re-run after editing CITIES or the copy
 // below.
 import { mkdirSync, writeFileSync } from "node:fs";
-import { CITIES } from "./city-data.mjs";
+import { CITIES } from "../src/data/cities.ts";
 
 const SITE_URL = "https://mapagrama.com";
 const PRICE_ROWS = [
@@ -36,7 +36,7 @@ const WHY_CARDS = [
 
 function pageHtml(city) {
   const title = `Póster de mapa de ${city.name} personalizado | Mapagrama`;
-  const description = `Crea tu propio póster de mapa de ${city.name}, ${city.region}. Elige colores, capas y texto en un editor en vivo. Impreso y enviado desde España, desde 29€.`;
+  const description = `Crea tu propio póster de mapa de ${city.name}, ${city.region} — ${city.blurb}. Elige colores, capas y texto en un editor en vivo. Impreso y enviado desde España, desde 29€.`;
   const canonical = `${SITE_URL}/mapa/${city.slug}/`;
   // Deep-links the editor straight to this city instead of the Madrid
   // default — read by useGeolocation's readCityDeepLink() on mount.
@@ -134,8 +134,9 @@ function pageHtml(city) {
         <h1>Póster de mapa de ${city.name}</h1>
         <p>
           Convierte ${city.name}, ${city.region}, en un póster de mapa
-          personalizado. Elige colores, capas y texto en un editor en vivo,
-          y recibe tu mapa impreso en casa. Producción en España.
+          personalizado — ${city.blurb}. Elige colores, capas y texto en un
+          editor en vivo, y recibe tu mapa impreso en casa. Producción en
+          España.
         </p>
         <a href="${editorUrl}" class="seo-hero-cta">Diseñar mi póster de ${city.name}</a>
       </section>

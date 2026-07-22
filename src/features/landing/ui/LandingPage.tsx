@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import FooterNote from "@/shared/ui/FooterNote";
+import { CITIES } from "@/data/cities";
 
 const EXAMPLE_CITIES = [
   { city: "Madrid", image: "madrid" },
@@ -20,21 +21,6 @@ const WHY_CARDS = [
     title: "Precio justo",
     body: "Desde 29€ — por debajo de lo habitual en pósters de mapas personalizados, que suelen arrancar en 45-50€.",
   },
-];
-
-// Kept in sync by hand with scripts/city-data.mjs — different runtimes
-// (Vite app vs. the plain Node build script), no easy shared import.
-const CITY_LINKS = [
-  { slug: "madrid", name: "Madrid" },
-  { slug: "barcelona", name: "Barcelona" },
-  { slug: "valencia", name: "Valencia" },
-  { slug: "sevilla", name: "Sevilla" },
-  { slug: "zaragoza", name: "Zaragoza" },
-  { slug: "malaga", name: "Málaga" },
-  { slug: "bilbao", name: "Bilbao" },
-  { slug: "gijon", name: "Gijón" },
-  { slug: "murcia", name: "Murcia" },
-  { slug: "vigo", name: "Vigo" },
 ];
 
 const PRICE_ROWS = [
@@ -235,7 +221,7 @@ export default function LandingPage() {
       <section className="landing-cities">
         <h2>Pósters de mapa por ciudad</h2>
         <ul className="landing-cities-list">
-          {CITY_LINKS.map(({ slug, name }) => (
+          {CITIES.map(({ slug, name }) => (
             <li key={slug}>
               {/* Plain <a>, not <Link>: these are separate static pages
                   outside the SPA router (see scripts/generate-city-pages.mjs). */}

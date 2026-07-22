@@ -214,9 +214,12 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       (subida real del blob generado por MapLibre, redirect a Stripe) —
       solo se ha verificado por API/curl y build limpio en esta sesión,
       no hay herramienta de navegador disponible para clic a clic.
-- [ ] Pendiente: sustituir las tarjetas de ejemplo de la landing
-      (Gijón/Oviedo/Madrid) por fotos reales del producto impreso o
-      renders reales del editor.
+- [x] Tarjetas de ejemplo de la landing con fotos reales (Madrid/
+      Barcelona/Gijón). Añadida además una segunda sección "En tu pared"
+      con mockups del póster enmarcado en una habitación real (generados
+      con Smartmockups — Gelato Mockup Studio no vale para esto sin tienda
+      conectada), en `src/features/landing/ui/LandingPage.tsx` +
+      `public/assets/examples/mockups/`.
 - [x] Desplegado en el VPS de producción (2026-07-22) y verificado en
       `mapagrama.com` real: `/`, `/crear`, `/pedido/gracias`,
       `/pedido/cancelado` y `/api/catalog` responden 200.
@@ -243,6 +246,45 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
          `purchased/`, así que el reintento fallaba con `NoSuchKey` al
          no encontrar el origen. Ahora comprueba primero si el destino
          ya existe y lo trata como hecho.
+- [x] Referencia de pedido legible en `/pedido/gracias` (2026-07-22):
+      antes mostraba el `session_id` de Stripe en crudo (formato demasiado
+      parecido a una API key). Nuevo endpoint `GET /orders/by-session/:id`
+      en `mapagrama-api` + `useOrderReference` (poll corto en el frontend,
+      ya que el webhook de Stripe que crea el pedido es async) — muestra
+      el mismo código corto que ya usa el email de confirmación.
+- [x] TLS "Full (strict)" entre Cloudflare y el VPS (2026-07-22): nginx
+      sirve HTTPS con un certificado de origen de Cloudflare (15 años,
+      `mapagrama-api/ssl/`, gitignored, montado por volumen — nunca en la
+      imagen ni en git), puerto 80 redirige a 443. **Incidente en el
+      proceso:** desplegar el redirect 80→443 *antes* de confirmar el
+      cambio de modo en el dashboard de Cloudflare tumbó la web entera con
+      un bucle de redirects (Cloudflare en modo "Flexible" siempre habla
+      con el origen por HTTP, así que el redirect del origen a HTTPS
+      creaba un bucle infinito) — status 60-90 segundos hasta el fix
+      (revertir el redirect, servir contenido normal en :80). Solo se
+      reactivó el redirect una vez confirmado el cambio a Full (strict).
+      Lección: con Cloudflare de por medio, cualquier cambio de
+      comportamiento en el puerto 80 del origen depende del modo SSL/TLS
+      configurado en el dashboard, no solo de la config de nginx.
+- [x] Backups diarios de la base de pedidos (2026-07-22): cron en el VPS
+      (`0 3 * * *`) ejecuta `bun run backup:db` dentro del contenedor
+      `api`, que hace `PRAGMA wal_checkpoint` (la db usa WAL, así que un
+      copiado en frío del fichero puede perder escrituras recientes),
+      comprime y sube a un bucket R2 **separado y privado**
+      (`mapagrama-backups`, sin dominio público — el bucket de diseños sí
+      lo tiene y no es sitio para backups con emails de clientes). Probado
+      con una subida real.
+- [x] Firma del webhook de Gelato (2026-07-22): Gelato no firma el cuerpo
+      con HMAC como Stripe — el dashboard deja configurar una cabecera
+      HTTP con un secreto compartido por webhook
+      (`X-Gelato-Webhook-Secret`, verificado con `timingSafeEqual` en
+      `routes/webhooks/gelato.ts`). **Hallazgo importante:** no existía
+      ningún webhook de Gelato registrado hasta ahora — el código que
+      procesa `printed/shipped/delivered` llevaba desde la Fase 2 sin
+      recibir tráfico real, así que ningún pedido había recibido esos
+      emails de seguimiento (solo el de confirmación inicial, que va por
+      Stripe). Ya registrado y probado con el webhook de prueba del
+      dashboard de Gelato.
 - [ ] SEO local: landings por ciudad española pre-renderizadas.
 - [ ] Diferenciación vs Mapiful/Grafomap: precio (producción EU),
       personalización profunda (colores hex libres, capas), nicho local.

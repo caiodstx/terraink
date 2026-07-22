@@ -8,14 +8,55 @@ import {
 import { GEOLOCATION_TIMEOUT_MS } from "@/features/map/infrastructure";
 import type { PosterAction } from "@/features/poster/application/posterReducer";
 
+// Deep link from a city SEO landing page (see
+// scripts/generate-city-pages.mjs's CTA hrefs, e.g. /crear?lat=...&lon=...
+// &city=Valencia&country=Espa%C3%B1a) — takes priority over geolocation:
+// someone clicking "diseñar mi póster de Valencia" wants Valencia, not
+// their GPS position or the Madrid fallback.
+function readCityDeepLink(): {
+  lat: number;
+  lon: number;
+  city: string;
+  country: string;
+} | null {
+  const params = new URLSearchParams(window.location.search);
+  const lat = Number(params.get("lat"));
+  const lon = Number(params.get("lon"));
+  const city = params.get("city");
+  const country = params.get("country");
+  if (!city || !country || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return null;
+  }
+  return { lat, lon, city, country };
+}
+
 /**
- * Initializes map start position from browser geolocation.
- * Falls back to Madrid coordinates when geolocation is unavailable or denied.
+ * Initializes map start position from a city deep link, then browser
+ * geolocation. Falls back to Madrid coordinates when geolocation is
+ * unavailable or denied.
  */
 export function useGeolocation(dispatch: React.Dispatch<PosterAction>) {
   useEffect(() => {
     let cancelled = false;
     const defaultLocationLabel = "Madrid, Comunidad de Madrid, España";
+
+    const deepLink = readCityDeepLink();
+    if (deepLink) {
+      dispatch({ type: "SET_USER_LOCATION", location: null });
+      dispatch({
+        type: "SET_FORM_FIELDS",
+        resetDisplayNameOverrides: true,
+        fields: {
+          location: `${deepLink.city}, ${deepLink.country}`,
+          latitude: deepLink.lat.toFixed(6),
+          longitude: deepLink.lon.toFixed(6),
+          displayCity: deepLink.city,
+          displayCountry: deepLink.country,
+          displayContinent: "Europe",
+        },
+      });
+      return;
+    }
 
     const applyFallback = () => {
       if (cancelled) return;

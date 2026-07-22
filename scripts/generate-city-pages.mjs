@@ -38,6 +38,15 @@ function pageHtml(city) {
   const title = `Póster de mapa de ${city.name} personalizado | Mapagrama`;
   const description = `Crea tu propio póster de mapa de ${city.name}, ${city.region}. Elige colores, capas y texto en un editor en vivo. Impreso y enviado desde España, desde 29€.`;
   const canonical = `${SITE_URL}/mapa/${city.slug}/`;
+  // Deep-links the editor straight to this city instead of the Madrid
+  // default — read by useGeolocation's readCityDeepLink() on mount.
+  // & is HTML-escaped since this string lands inside href="..." attributes.
+  const editorUrl = `/crear?${new URLSearchParams({
+    lat: String(city.lat),
+    lon: String(city.lon),
+    city: city.name,
+    country: "España",
+  })}`.replace(/&/g, "&amp;");
   const ogImage = city.hasExample
     ? `${SITE_URL}/assets/examples/mockups/${city.slug}.jpg`
     : `${SITE_URL}/assets/banner.jpg`;
@@ -105,7 +114,7 @@ function pageHtml(city) {
           <img src="/assets/logo.svg" alt="" />
           <span>Mapagrama</span>
         </a>
-        <a href="/crear" class="seo-nav-cta">Crear mi mapa</a>
+        <a href="${editorUrl}" class="seo-nav-cta">Crear mi mapa</a>
       </header>
 
       <section class="seo-hero">
@@ -115,7 +124,7 @@ function pageHtml(city) {
           personalizado. Elige colores, capas y texto en un editor en vivo,
           y recibe tu mapa impreso en casa. Producción en España.
         </p>
-        <a href="/crear" class="seo-hero-cta">Diseñar mi póster de ${city.name}</a>
+        <a href="${editorUrl}" class="seo-hero-cta">Diseñar mi póster de ${city.name}</a>
       </section>
 
       ${
@@ -143,7 +152,7 @@ function pageHtml(city) {
             (row) => `<li><span>${row.label}</span><span>${row.price}</span></li>`,
           ).join("\n          ")}
         </ul>
-        <a href="/crear" class="seo-hero-cta">Empieza a diseñar</a>
+        <a href="${editorUrl}" class="seo-hero-cta">Empieza a diseñar</a>
       </section>
 
       <nav class="seo-cities-nav">

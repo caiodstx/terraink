@@ -10,7 +10,9 @@
     "preview": "bunx --bun vite preview --host",
     "typecheck": "tsc --noEmit",
     "showcase:grid": "node scripts/combine-showcase-grid.mjs",
-    "seo:cities": "bun run scripts/generate-city-pages.mjs"
+    "seo:cities": "bun run scripts/generate-city-pages.mjs",
+    "render:cities": "bun run scripts/render-city-posters.mjs",
+    "process:examples": "bun run scripts/process-examples.mjs"
   },
   "dependencies": {
     "maplibre-gl": "^5.19.0",
@@ -37,6 +39,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.4.1",
+    "puppeteer-core": "^25.3.0",
     "sharp": "^0.34.5",
     "typescript": "^5.9.3",
     "vite": "^5.4.11"

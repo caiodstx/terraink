@@ -13,6 +13,11 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { CITIES } from "../src/data/cities.ts";
 
 const SITE_URL = "https://mapagrama.com";
+// The only 3 cities with a real poster-in-a-room photo (Smartmockups, shot
+// by hand — not something render-city-posters.mjs can produce). Everyone
+// else's og:image falls back to their flat map render, which does exist
+// for all 70 as of 2026-07-22.
+const MOCKUP_SLUGS = new Set(["madrid", "barcelona", "gijon"]);
 const PRICE_ROWS = [
   { label: "Póster 30x40cm", price: "29€" },
   { label: "Póster 50x70cm", price: "44€" },
@@ -47,9 +52,11 @@ function pageHtml(city) {
     city: city.name,
     country: "España",
   })}`.replace(/&/g, "&amp;");
-  const ogImage = city.hasExample
+  const ogImage = MOCKUP_SLUGS.has(city.slug)
     ? `${SITE_URL}/assets/examples/mockups/${city.slug}.jpg`
-    : `${SITE_URL}/assets/banner.jpg`;
+    : city.hasExample
+      ? `${SITE_URL}/assets/examples/${city.slug}.jpg`
+      : `${SITE_URL}/assets/banner.jpg`;
 
   const previewBlock = city.hasExample
     ? `<picture>

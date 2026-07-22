@@ -285,9 +285,26 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       emails de seguimiento (solo el de confirmación inicial, que va por
       Stripe). Ya registrado y probado con el webhook de prueba del
       dashboard de Gelato.
-- [ ] SEO local: landings por ciudad española pre-renderizadas.
-- [ ] Diferenciación vs Mapiful/Grafomap: precio (producción EU),
-      personalización profunda (colores hex libres, capas), nicho local.
+- [x] Diferenciación (2026-07-22): sección "Por qué Mapagrama" en la
+      landing (`src/features/landing/ui/LandingPage.tsx`). Deliberadamente
+      sin nombrar a Mapiful/Grafomap — la publicidad comparativa citando
+      competidor tiene requisitos legales estrictos en ES/UE — en su lugar,
+      claims propios verificables (investigado: Mapiful ~45$ con temas de
+      color predefinidos y producción en varios países; Grafomap ~49$ con
+      ~100 combinaciones cerradas de tema×color): personalización real por
+      hexadecimal (no plantillas cerradas), producción en España, precio
+      desde 29€ (por debajo del ~45-50€ habitual del sector).
+- [x] SEO local (2026-07-22): 10 páginas estáticas pre-renderizadas por
+      ciudad española (Madrid, Barcelona, Valencia, Sevilla, Zaragoza,
+      Málaga, Bilbao, Gijón, Murcia, Vigo) en `/mapa/<slug>/` — HTML real
+      servido directo por nginx (no la SPA), con título/descripción/OG
+      específicos por ciudad, generadas por
+      `scripts/generate-city-pages.mjs` a partir de `scripts/city-data.mjs`
+      (wired a `bun run build`, o `bun run seo:cities` suelto).
+      `sitemap.xml` se genera del mismo script. Enlazadas desde la landing
+      y entre sí. De paso corregido: `index.html` seguía con meta
+      tags/JSON-LD en inglés pese a que el contenido real ya está en
+      español — traducido, `lang="es"`.
 
 ## Convenciones de trabajo
 

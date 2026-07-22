@@ -324,8 +324,23 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       la app Vite y el script de generación.
       **Pendiente del usuario:** reenviar el sitemap actualizado en
       Search Console (ahora 72 URLs, antes 12).
-- [ ] Script de render automático: generar el póster real de cada ciudad
-      con el motor propio → imagen hero + og:image únicas por página.
+- [x] Script de render automático (2026-07-22):
+      `scripts/render-city-posters.mjs`, imagen hero + og:image real por
+      ciudad (las 70) generada con el motor propio del editor, no un
+      mockup. Automatiza `bun run dev` con `puppeteer-core` controlando
+      el Edge del sistema en headless, deep-linkeando cada ciudad y
+      llamando a `window.mapagramaExportFullAsync` (nueva variante del
+      bridge dev-only en `DevExportBridge.tsx` que devuelve el blob en
+      base64 en vez de disparar una descarga real). **Playwright con su
+      modo de lanzamiento por pipe nunca consiguió conectar por CDP en
+      este entorno** (confirmado con curl que el handshake WebSocket
+      funciona bien a nivel de red — el problema era específico del
+      cliente de Playwright bajo Bun) — `puppeteer-core` con
+      `--remote-debugging-port` + polling HTTP sí funcionó, primera
+      pasada completa sin fallos (70/70). `scripts/process-examples.mjs`
+      redimensiona los PNG de 300dpi a los JPEG/WebP que de verdad se
+      sirven. Scripts nuevos: `bun run render:cities`,
+      `bun run process:examples`.
 - [x] Deep-link: `/mapa/<slug>/` → `/crear?lat=&lon=&city=&country=` con
       el mapa centrado en esa ciudad (2026-07-22, ver Fase 4 — incluyó
       arreglar una condición de carrera real donde el mapa volvía a

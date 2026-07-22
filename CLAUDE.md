@@ -372,8 +372,17 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       la landing (no en el footer global — ese footer compartido
       también aparece dentro del editor de pago, donde estos enlaces
       no pintan nada) y entre sí.
-- [ ] Pinterest Business: cuenta verificada con el dominio, pin por
-      ciudad/tema de color, rich pins de producto.
+- [~] Pinterest Business (2026-07-22): cuenta creada, dominio verificado
+      (`<meta name="p:domain_verify">` en `index.html`). Catálogo de
+      productos enviado reutilizando el mismo feed de Merchant Center
+      (`https://mapagrama.com/api/product-feed.txt`) — resultó que
+      Pinterest pide casi las mismas columnas que Google (solo faltaba
+      `product_type`, ya añadido), así que es un feed único para las
+      dos plataformas. En proceso de validación por parte de Pinterest.
+      **Pendiente:** crear los pines reales por ciudad/ocasión (acción
+      manual del usuario en la UI de Pinterest — no hay API sin una app
+      aprobada) usando las 70 imágenes de ciudad + 3 mockups ya
+      generados.
 - [x] Técnico (2026-07-22): cache-control 1h en `/mapa/*` (nginx.conf —
       no es 1y/immutable como `/assets/` porque no lleva hash de
       contenido en la URL), imágenes de ejemplo/mockups en WebP con

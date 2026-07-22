@@ -25,6 +25,23 @@ export async function uploadDesign(blob: Blob): Promise<UploadDesignResult> {
   return res.json();
 }
 
+export interface OrderReferenceResult {
+  found: boolean;
+  reference?: string;
+  status?: string;
+}
+
+export async function fetchOrderReference(sessionId: string): Promise<OrderReferenceResult> {
+  const res = await fetchAdapter.get(`${API_BASE_URL}/orders/by-session/${encodeURIComponent(sessionId)}`);
+  if (res.status === 404) {
+    return { found: false };
+  }
+  if (!res.ok) {
+    throw new Error(`No se pudo obtener el pedido (${res.status}).`);
+  }
+  return res.json();
+}
+
 export interface CheckoutSessionResult {
   url: string;
 }

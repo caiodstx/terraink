@@ -228,7 +228,21 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       del servidor.
 
 ### Fase 4 — Lanzamiento
-- [ ] Pedido real end-to-end de prueba.
+- [x] Pedido real end-to-end de prueba (2026-07-22): diseño → `BuyModal` →
+      Stripe live → webhook → Gelato. Encontrados y arreglados 2 bugs
+      reales que dejaron el primer pedido atascado (pagado, sin llegar a
+      Gelato) — recuperado a mano tras el fix, sin coste extra para el
+      cliente:
+      1. Esta cuenta de Stripe ya reporta la dirección de envío en
+         `collected_information.shipping_details`, no en el campo legado
+         `session.shipping_details` (vacío) — justo el riesgo que ya
+         estaba anotado en el código. `toGelatoShippingAddress` ahora lee
+         primero `collected_information`, con fallback al campo legado.
+      2. El fallo anterior disparó un reintento de Stripe; para entonces
+         `markDesignPurchased` ya había movido el archivo de `pending/` a
+         `purchased/`, así que el reintento fallaba con `NoSuchKey` al
+         no encontrar el origen. Ahora comprueba primero si el destino
+         ya existe y lo trata como hecho.
 - [ ] SEO local: landings por ciudad española pre-renderizadas.
 - [ ] Diferenciación vs Mapiful/Grafomap: precio (producción EU),
       personalización profunda (colores hex libres, capas), nicho local.

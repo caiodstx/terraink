@@ -206,10 +206,11 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       al español, alojado en `designs.mapagrama.com/legal/*.md` (R2).
       Contenido real escrito con los datos conocidos del negocio,
       exención de desistimiento art. 103 LGDCU incluida explícitamente.
-      **Es un borrador de partida, no revisado por un profesional — hay
-      que confirmarlo con un gestor/abogado antes de operar con clientes
-      reales**, especialmente el NIF (dejado como placeholder, no lo
-      tengo).
+      **NIF real ya puesto** (verificado 2026-07-22 directamente en los
+      documentos servidos desde R2). **El texto en sí sigue siendo un
+      borrador de partida mío, no confirmado como revisado por un
+      gestor/abogado** — pendiente de aclarar con el usuario si ya hubo
+      esa revisión profesional antes de darlo por cerrado del todo.
 - [x] Flujo de compra probado clic a clic en navegador real — cubierto por
       el pedido real end-to-end de Fase 4 (diseño → `BuyModal` → Stripe
       live → webhook → Gelato).
@@ -304,6 +305,31 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       y entre sí. De paso corregido: `index.html` seguía con meta
       tags/JSON-LD en inglés pese a que el contenido real ya está en
       español — traducido, `lang="es"`.
+
+### Fase 5 — SEO y adquisición
+
+- [ ] Google Search Console + Bing Webmaster: verificar dominio, enviar
+      sitemap, solicitar indexación de /mapa/*. Revisar cobertura semanal.
+- [ ] Escalar city-data.mjs a 60-80 ciudades (capitales de provincia +
+      grandes municipios) con párrafo único por ciudad (qué muestra su
+      mapa) para evitar patrón doorway-page.
+- [ ] Script de render automático: generar el póster real de cada ciudad
+      con el motor propio → imagen hero + og:image únicas por página.
+- [x] Deep-link: `/mapa/<slug>/` → `/crear?lat=&lon=&city=&country=` con
+      el mapa centrado en esa ciudad (2026-07-22, ver Fase 4 — incluyó
+      arreglar una condición de carrera real donde el mapa volvía a
+      Madrid nada más cargar).
+- [ ] Schema.org: Product (precio/stock) en landing y páginas de ciudad,
+      BreadcrumbList, FAQPage en la landing.
+- [ ] Google Merchant Center: feed de productos → listings gratuitos en
+      Shopping. Requiere el schema Product anterior.
+- [ ] Landings de intención de regalo: /regalo-aniversario,
+      /regalo-pareja, /regalo-mudanza (enlazadas desde landing y footer).
+- [ ] Pinterest Business: cuenta verificada con el dominio, pin por
+      ciudad/tema de color, rich pins de producto.
+- [ ] Técnico: cache-control largo en /mapa/* y assets, imágenes WebP,
+      canonical en páginas de ciudad, comprobar que la SPA no duplica
+      rutas /mapa/*.
 
 ## Convenciones de trabajo
 

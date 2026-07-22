@@ -7,6 +7,21 @@ const EXAMPLE_CITIES = [
   { city: "Gijón", image: "gijon" },
 ];
 
+const WHY_CARDS = [
+  {
+    title: "Personalización real",
+    body: "Elige cualquier color en hexadecimal y qué capas del mapa mostrar — no una plantilla cerrada de temas predefinidos.",
+  },
+  {
+    title: "Producción en España",
+    body: "Se imprime y envía desde España. Sin aduanas, sin semanas de espera desde fuera de la UE.",
+  },
+  {
+    title: "Precio justo",
+    body: "Desde 29€ — por debajo de lo habitual en pósters de mapas personalizados, que suelen arrancar en 45-50€.",
+  },
+];
+
 const PRICE_ROWS = [
   { label: "Póster 30x40cm", price: "29€" },
   { label: "Póster 50x70cm", price: "44€" },
@@ -65,6 +80,18 @@ export default function LandingPage() {
                 alt={`Póster de mapa de ${city} enmarcado en una habitación`}
                 loading="lazy"
               />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-why">
+        <h2>Por qué Mapagrama</h2>
+        <div className="landing-why-grid">
+          {WHY_CARDS.map(({ title, body }) => (
+            <div key={title} className="landing-why-card">
+              <strong>{title}</strong>
+              <p>{body}</p>
             </div>
           ))}
         </div>

@@ -81,6 +81,7 @@
 
 .landing-examples h2,
 .landing-mockups h2,
+.landing-why h2,
 .landing-steps h2,
 .landing-pricing h2 {
   text-align: center;
@@ -173,6 +174,32 @@
   display: block;
   width: 100%;
   height: auto;
+}
+
+.landing-why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.landing-why-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  background: var(--item-bg);
+}
+
+.landing-why-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #c9a227;
+}
+
+.landing-why-card p {
+  margin: 0;
+  color: rgba(214, 234, 247, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .landing-steps-list {

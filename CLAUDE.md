@@ -194,9 +194,9 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       `GET /catalog`) y `BuyFab`.
 - [x] Descarga gratuita convertida en vista previa: PNG, 72dpi, marca de
       agua ("MAPAGRAMA — VISTA PREVIA"). PDF/SVG ya no son gratis.
-- [x] Página de producto/landing (`/`) con ejemplos (Gijón/Oviedo/Madrid
-      — placeholders visuales, pendiente sustituir por fotos reales del
-      producto), pasos "cómo funciona" y precios. Router añadido
+- [x] Página de producto/landing (`/`) con ejemplos (Madrid/Barcelona/
+      Gijón, fotos reales — ver entrada de diferenciación/mockups más
+      abajo), pasos "cómo funciona" y precios. Router añadido
       (react-router-dom): `/` landing, `/crear` editor, `/pedido/gracias`
       y `/pedido/cancelado` (las dos últimas ya las usa el backend como
       redirect de Stripe).

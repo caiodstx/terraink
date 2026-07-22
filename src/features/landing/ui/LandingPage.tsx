@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import FooterNote from "@/shared/ui/FooterNote";
 
 const EXAMPLE_CITIES = [
-  { city: "Madrid", country: "España · 40.42° N, 3.70° O", image: "madrid" },
-  { city: "Barcelona", country: "España · 41.39° N, 2.16° O", image: "barcelona" },
-  { city: "Gijón", country: "España · 43.5° N, 5.66° O", image: "gijon" },
+  { city: "Madrid", image: "madrid" },
+  { city: "Barcelona", image: "barcelona" },
+  { city: "Gijón", image: "gijon" },
 ];
 
 const PRICE_ROWS = [
@@ -41,7 +41,7 @@ export default function LandingPage() {
       <section className="landing-examples">
         <h2>Algunos ejemplos</h2>
         <div className="landing-examples-grid">
-          {EXAMPLE_CITIES.map(({ city, country, image }) => (
+          {EXAMPLE_CITIES.map(({ city, image }) => (
             <div key={city} className="landing-example-card">
               <div className="landing-example-preview">
                 <img
@@ -49,10 +49,6 @@ export default function LandingPage() {
                   alt={`Póster de mapa de ${city}`}
                   loading="lazy"
                 />
-              </div>
-              <div className="landing-example-typeblock">
-                <p className="landing-example-city">{city}</p>
-                <p className="landing-example-country">{country}</p>
               </div>
             </div>
           ))}

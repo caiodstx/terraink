@@ -102,6 +102,13 @@
   border-radius: 14px;
   overflow: hidden;
   background: var(--item-bg);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.landing-example-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201, 162, 39, 0.5);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
 }
 
 .landing-example-preview {
@@ -136,6 +143,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.landing-example-card:hover .landing-example-preview img {
+  transform: scale(1.08);
 }
 
 .landing-steps-list {

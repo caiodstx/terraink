@@ -37,11 +37,13 @@
    ══════════════════════════════════════════════════════════ */
 
 @media (min-width: 769px) and (hover: hover) and (pointer: fine) {
-  /* ── Prevent body scroll; app fills viewport ── */
+  /* ── Prevent body scroll; app fills viewport — only on the editor
+     route (html.route-editor, toggled in App.tsx). Other routes
+     (landing, order result pages) need normal document scroll. ── */
 
-  html,
-  body,
-  #root {
+  html.route-editor,
+  html.route-editor body,
+  html.route-editor #root {
     height: 100%;
     overflow: hidden;
   }

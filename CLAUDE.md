@@ -308,8 +308,10 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 
 ### Fase 5 — SEO y adquisición
 
-- [ ] Google Search Console + Bing Webmaster: verificar dominio, enviar
-      sitemap, solicitar indexación de /mapa/*. Revisar cobertura semanal.
+- [x] Google Search Console (2026-07-22): dominio verificado, sitemap
+      enviado y procesado (12/12 páginas descubiertas, coincide con
+      home + /crear + 10 ciudades). Bing Webmaster pendiente (se puede
+      importar directo desde Search Console con un botón).
 - [ ] Escalar city-data.mjs a 60-80 ciudades (capitales de provincia +
       grandes municipios) con párrafo único por ciudad (qué muestra su
       mapa) para evitar patrón doorway-page.
@@ -319,17 +321,36 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       el mapa centrado en esa ciudad (2026-07-22, ver Fase 4 — incluyó
       arreglar una condición de carrera real donde el mapa volvía a
       Madrid nada más cargar).
-- [ ] Schema.org: Product (precio/stock) en landing y páginas de ciudad,
-      BreadcrumbList, FAQPage en la landing.
-- [ ] Google Merchant Center: feed de productos → listings gratuitos en
-      Shopping. Requiere el schema Product anterior.
+- [x] Schema.org (2026-07-22): Product/AggregateOffer y FAQPage (con
+      sección FAQ visible en la landing que coincide palabra por
+      palabra con el JSON-LD — Google exige que el schema no esté solo
+      oculto) en `LandingPage.tsx`; BreadcrumbList en cada página de
+      ciudad (`scripts/generate-city-pages.mjs`).
+- [x] Google Merchant Center (2026-07-22): feed real en
+      `GET /api/product-feed.txt` (`mapagrama-api/src/routes/productFeed.ts`,
+      generado en vivo desde `CATALOG`, mismo patrón que `/catalog` —
+      Merchant Center lo vuelve a leer solo, sin subida manual).
+      Configurado: España/Español, envío gratuito (confirmado en el
+      código de checkout que no se cobra envío aparte — ya va incluido
+      en el precio), solo devoluciones de productos defectuosos (no
+      "cambió de opinión" — coherente con la exención de desistimiento
+      del art. 103 LGDCU que ya redactamos), sin cambios, URL de
+      política = `designs.mapagrama.com/legal/withdrawal.md`.
+      **Gap conocido:** no hay foto real de marco dorado — esas
+      variantes usan la foto del póster sin marco en el feed en vez de
+      un marco que no existe todavía. Actualizar cuando exista un
+      mockup dorado real.
 - [ ] Landings de intención de regalo: /regalo-aniversario,
       /regalo-pareja, /regalo-mudanza (enlazadas desde landing y footer).
 - [ ] Pinterest Business: cuenta verificada con el dominio, pin por
       ciudad/tema de color, rich pins de producto.
-- [ ] Técnico: cache-control largo en /mapa/* y assets, imágenes WebP,
-      canonical en páginas de ciudad, comprobar que la SPA no duplica
-      rutas /mapa/*.
+- [x] Técnico (2026-07-22): cache-control 1h en `/mapa/*` (nginx.conf —
+      no es 1y/immutable como `/assets/` porque no lleva hash de
+      contenido en la URL), imágenes de ejemplo/mockups en WebP con
+      fallback JPEG, canonical ya presente en cada página de ciudad
+      desde que se crearon, confirmado que React Router no tiene
+      ninguna ruta `/mapa/*` (cero riesgo de duplicar con las páginas
+      estáticas).
 
 ## Convenciones de trabajo
 

@@ -308,13 +308,22 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 
 ### Fase 5 — SEO y adquisición
 
-- [x] Google Search Console (2026-07-22): dominio verificado, sitemap
-      enviado y procesado (12/12 páginas descubiertas, coincide con
-      home + /crear + 10 ciudades). Bing Webmaster pendiente (se puede
-      importar directo desde Search Console con un botón).
-- [ ] Escalar city-data.mjs a 60-80 ciudades (capitales de provincia +
-      grandes municipios) con párrafo único por ciudad (qué muestra su
-      mapa) para evitar patrón doorway-page.
+- [x] Google Search Console + Bing Webmaster (2026-07-22): dominio
+      verificado en ambos, sitemap enviado y procesado en Search Console
+      (12/12 páginas descubiertas), Bing importado directo desde Search
+      Console. Bing aún en proceso de indexar (normal, tarda más).
+- [x] Escalar a 70 ciudades (2026-07-22): las 52 capitales de provincia
+      + ~18 grandes municipios adicionales, cada una con un párrafo
+      propio (`blurb` en `src/data/cities.ts`) tejido en el hero y la
+      meta description — no solo cambia el nombre de la ciudad, para
+      no parecer un patrón doorway-page a ojos de un buscador.
+      Refactor de paso: la lista de ciudades vivía duplicada a mano en
+      `scripts/city-data.mjs` y en `LandingPage.tsx` — movida a
+      `src/data/cities.ts` (dato puro sin código Node-specific, bun
+      puede importar `.ts` directo), una sola fuente de verdad para
+      la app Vite y el script de generación.
+      **Pendiente del usuario:** reenviar el sitemap actualizado en
+      Search Console (ahora 72 URLs, antes 12).
 - [ ] Script de render automático: generar el póster real de cada ciudad
       con el motor propio → imagen hero + og:image únicas por página.
 - [x] Deep-link: `/mapa/<slug>/` → `/crear?lat=&lon=&city=&country=` con

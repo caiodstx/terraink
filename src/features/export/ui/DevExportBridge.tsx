@@ -16,11 +16,26 @@ export default function DevExportBridge() {
     (window as any).mapagramaExportFull = (format: ExportFormat = "png") => {
       void exportPoster(format, { quality: "purchase", download: true });
     };
+    // Headless-automation variant (scripts/render-city-posters.mjs, used to
+    // batch-generate the /mapa/<slug>/ hero images) — returns a base64 data
+    // URL instead of triggering a browser download, which is awkward to
+    // intercept reliably from Playwright.
+    (window as any).mapagramaExportFullAsync = async (format: ExportFormat = "png") => {
+      const blob = await exportPoster(format, { quality: "purchase", download: false });
+      if (!blob) return null;
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    };
     console.info(
       "[dev] window.mapagramaExportFull('png' | 'pdf' | 'svg') — full 300dpi, no watermark.",
     );
     return () => {
       delete (window as any).mapagramaExportFull;
+      delete (window as any).mapagramaExportFullAsync;
     };
   }, [exportPoster]);
 

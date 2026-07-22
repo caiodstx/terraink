@@ -1,16 +1,18 @@
-// Generates public/mapa/<slug>/index.html — one real, static HTML page per
-// city for SEO and social-link previews. This is a Vite SPA with a single
-// index.html shell, so client-side routes can't carry per-city <title>/
-// meta/OG tags in the initial response; these pages are plain HTML instead,
-// served directly by nginx (see nginx.conf's `try_files $uri $uri/
-// /index.html`, which resolves /mapa/madrid/ to this directory's own
-// index.html before ever falling back to the SPA).
+// Generates public/mapa/<slug>/index.html (one per city) and
+// public/<gift-intent-slug>/index.html (regalo-aniversario, etc.) — real,
+// static HTML pages for SEO and social-link previews. This is a Vite SPA
+// with a single index.html shell, so client-side routes can't carry
+// per-page <title>/meta/OG tags in the initial response; these pages are
+// plain HTML instead, served directly by nginx (see nginx.conf's
+// `try_files $uri $uri/ /index.html`, which resolves e.g. /mapa/madrid/ to
+// that directory's own index.html before ever falling back to the SPA).
 //
 // Run via `bun run seo:cities` (also wired into `bun run build`, so pages
-// stay in sync automatically). Re-run after editing CITIES or the copy
-// below.
+// stay in sync automatically). Re-run after editing CITIES, GIFT_INTENTS,
+// or the copy below.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { CITIES } from "../src/data/cities.ts";
+import { GIFT_INTENTS } from "../src/data/giftIntents.ts";
 
 const SITE_URL = "https://mapagrama.com";
 // The only 3 cities with a real poster-in-a-room photo (Smartmockups, shot
@@ -194,10 +196,143 @@ function pageHtml(city) {
 `;
 }
 
+function giftPageHtml(gift) {
+  const canonical = `${SITE_URL}/${gift.slug}/`;
+  const ogImage = `${SITE_URL}/assets/examples/mockups/${gift.mockupSlug}.jpg`;
+  const otherGifts = GIFT_INTENTS.filter((g) => g.slug !== gift.slug);
+
+  return `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <title>${gift.metaTitle}</title>
+
+    <meta name="description" content="${gift.description}" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Mapagrama" />
+    <link rel="canonical" href="${canonical}" />
+    <link rel="stylesheet" href="/assets/seo-landing.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap"
+    />
+
+    <meta name="theme-color" content="#0a1824" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mapagrama" />
+    <meta property="og:title" content="${gift.metaTitle}" />
+    <meta property="og:description" content="${gift.description}" />
+    <meta property="og:url" content="${canonical}" />
+    <meta property="og:image" content="${ogImage}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${gift.metaTitle}" />
+    <meta name="twitter:description" content="${gift.description}" />
+    <meta name="twitter:image" content="${ogImage}" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "${gift.metaTitle}",
+        "description": "${gift.description}",
+        "url": "${canonical}",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Mapagrama",
+          "url": "${SITE_URL}"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Mapagrama", "item": "${SITE_URL}/" },
+          { "@type": "ListItem", "position": 2, "name": "${gift.title}", "item": "${canonical}" }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div class="seo-page">
+      <header class="seo-header">
+        <a href="/" class="seo-brand">
+          <img src="/assets/logo.svg" alt="" />
+          <span>Mapagrama</span>
+        </a>
+        <a href="/crear" class="seo-nav-cta">Crear mi mapa</a>
+      </header>
+
+      <section class="seo-hero">
+        <h1>${gift.title}</h1>
+        <p>${gift.pitch}</p>
+        <a href="/crear" class="seo-hero-cta">Diseñar este regalo</a>
+      </section>
+
+      <div class="seo-preview">
+        <img src="/assets/examples/mockups/${gift.mockupSlug}.jpg" alt="${gift.title}" loading="lazy" />
+      </div>
+
+      <section class="seo-why">
+        <h2>Por qué Mapagrama</h2>
+        <div class="seo-why-grid">
+          ${WHY_CARDS.map(
+            (card) => `<div class="seo-why-card">
+            <strong>${card.title}</strong>
+            <p>${card.body}</p>
+          </div>`,
+          ).join("\n          ")}
+        </div>
+      </section>
+
+      <section class="seo-pricing">
+        <h2>Precios</h2>
+        <ul class="seo-pricing-list">
+          ${PRICE_ROWS.map(
+            (row) => `<li><span>${row.label}</span><span>${row.price}</span></li>`,
+          ).join("\n          ")}
+        </ul>
+        <a href="/crear" class="seo-hero-cta">Empieza a diseñar</a>
+      </section>
+
+      <nav class="seo-cities-nav">
+        <h2>Otras ideas de regalo</h2>
+        <ul>
+          ${otherGifts
+            .map((g) => `<li><a href="/${g.slug}/">${g.title}</a></li>`)
+            .join("\n          ")}
+          <li><a href="/#landing-cities">O elige directamente una ciudad</a></li>
+        </ul>
+      </nav>
+
+      <footer class="seo-footer">
+        <p>© Mapagrama · <a href="/">mapagrama.com</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
+`;
+}
+
 for (const city of CITIES) {
   const dir = `public/mapa/${city.slug}`;
   mkdirSync(dir, { recursive: true });
   writeFileSync(`${dir}/index.html`, pageHtml(city));
+  console.log(`generated ${dir}/index.html`);
+}
+
+for (const gift of GIFT_INTENTS) {
+  const dir = `public/${gift.slug}`;
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(`${dir}/index.html`, giftPageHtml(gift));
   console.log(`generated ${dir}/index.html`);
 }
 
@@ -206,6 +341,7 @@ const sitemapUrls = [
   { loc: SITE_URL, priority: "1.0" },
   { loc: `${SITE_URL}/crear`, priority: "0.8" },
   ...CITIES.map((c) => ({ loc: `${SITE_URL}/mapa/${c.slug}/`, priority: "0.7" })),
+  ...GIFT_INTENTS.map((g) => ({ loc: `${SITE_URL}/${g.slug}/`, priority: "0.7" })),
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import FooterNote from "@/shared/ui/FooterNote";
 import { CITIES } from "@/data/cities";
+import { GIFT_INTENTS } from "@/data/giftIntents";
 
 const EXAMPLE_CITIES = [
   { city: "Madrid", image: "madrid" },
@@ -197,6 +198,18 @@ export default function LandingPage() {
         </Link>
       </section>
 
+      <section className="landing-gifts">
+        <h2>Ideas de regalo</h2>
+        <div className="landing-gifts-grid">
+          {GIFT_INTENTS.map(({ slug, title, teaser }) => (
+            <a key={slug} href={`/${slug}/`} className="landing-gift-card">
+              <strong>{title}</strong>
+              <p>{teaser}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
       <section className="landing-faq">
         <h2>Preguntas frecuentes</h2>
         <dl className="landing-faq-list">
@@ -218,7 +231,7 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
       />
 
-      <section className="landing-cities">
+      <section className="landing-cities" id="landing-cities">
         <h2>Pósters de mapa por ciudad</h2>
         <ul className="landing-cities-list">
           {CITIES.map(({ slug, name }) => (

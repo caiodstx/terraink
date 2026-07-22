@@ -144,9 +144,46 @@
   line-height: 1.55;
 }
 
+.landing-gifts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.landing-gift-card {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  background: var(--item-bg);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.landing-gift-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201, 162, 39, 0.5);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+}
+
+.landing-gift-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #c9a227;
+}
+
+.landing-gift-card p {
+  margin: 0;
+  color: rgba(214, 234, 247, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .landing-examples h2,
 .landing-mockups h2,
 .landing-why h2,
+.landing-gifts h2,
 .landing-faq h2,
 .landing-steps h2,
 .landing-pricing h2 {

@@ -34,11 +34,11 @@ export const DEFAULT_CONTAINER_PX = 600;
 /** Duration (ms) for flyTo animation when selecting a location. */
 export const FLY_TO_DURATION_MS = 1800;
 
-/** Hanover, Germany — default fallback when geolocation is denied. */
-export const DEFAULT_LAT = 52.3759;
-export const DEFAULT_LON = 9.732;
-export const DEFAULT_CITY = "Hanover";
-export const DEFAULT_COUNTRY = "Germany";
+/** Madrid, España — default fallback when geolocation is denied. */
+export const DEFAULT_LAT = 40.4168;
+export const DEFAULT_LON = -3.7038;
+export const DEFAULT_CITY = "Madrid";
+export const DEFAULT_COUNTRY = "España";
 
 export const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? "";
 

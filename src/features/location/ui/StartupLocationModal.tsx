@@ -18,7 +18,7 @@ import { useLocationAutocomplete } from "@/features/location/application/useLoca
 import type { SearchResult } from "@/features/location/domain/types";
 
 const CLOSE_ANIMATION_MS = 220;
-const DEFAULT_LOCATION_LABEL = "Hanover, Region Hannover, Lower Saxony, Germany";
+const DEFAULT_LOCATION_LABEL = "Madrid, Comunidad de Madrid, España";
 
 interface PendingLocation {
   label: string;

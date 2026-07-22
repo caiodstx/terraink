@@ -6,10 +6,11 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "bunx --bun vite --host",
-    "build": "bunx --bun vite build",
+    "build": "bun run scripts/generate-city-pages.mjs && bunx --bun vite build",
     "preview": "bunx --bun vite preview --host",
     "typecheck": "tsc --noEmit",
-    "showcase:grid": "node scripts/combine-showcase-grid.mjs"
+    "showcase:grid": "node scripts/combine-showcase-grid.mjs",
+    "seo:cities": "bun run scripts/generate-city-pages.mjs"
   },
   "dependencies": {
     "maplibre-gl": "^5.19.0",

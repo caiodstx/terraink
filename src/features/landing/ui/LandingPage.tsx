@@ -22,6 +22,21 @@ const WHY_CARDS = [
   },
 ];
 
+// Kept in sync by hand with scripts/city-data.mjs — different runtimes
+// (Vite app vs. the plain Node build script), no easy shared import.
+const CITY_LINKS = [
+  { slug: "madrid", name: "Madrid" },
+  { slug: "barcelona", name: "Barcelona" },
+  { slug: "valencia", name: "Valencia" },
+  { slug: "sevilla", name: "Sevilla" },
+  { slug: "zaragoza", name: "Zaragoza" },
+  { slug: "malaga", name: "Málaga" },
+  { slug: "bilbao", name: "Bilbao" },
+  { slug: "gijon", name: "Gijón" },
+  { slug: "murcia", name: "Murcia" },
+  { slug: "vigo", name: "Vigo" },
+];
+
 const PRICE_ROWS = [
   { label: "Póster 30x40cm", price: "29€" },
   { label: "Póster 50x70cm", price: "44€" },
@@ -128,6 +143,19 @@ export default function LandingPage() {
         <Link to="/crear" className="landing-hero-cta">
           Empieza a diseñar
         </Link>
+      </section>
+
+      <section className="landing-cities">
+        <h2>Pósters de mapa por ciudad</h2>
+        <ul className="landing-cities-list">
+          {CITY_LINKS.map(({ slug, name }) => (
+            <li key={slug}>
+              {/* Plain <a>, not <Link>: these are separate static pages
+                  outside the SPA router (see scripts/generate-city-pages.mjs). */}
+              <a href={`/mapa/${slug}/`}>Mapa de {name}</a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <FooterNote />

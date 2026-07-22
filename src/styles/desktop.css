@@ -873,15 +873,15 @@
      that flows after the page content instead of covering it. */
   .desktop-footer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 8px 16px;
     text-align: left;
     margin: 0;
     padding: 8px 18px;
     border-top: 1px solid rgba(146, 176, 200, 0.12);
     background: var(--overlay-bg);
-    white-space: nowrap;
   }
 
   html.route-editor .desktop-footer {
@@ -892,6 +892,8 @@
     z-index: 31;
     padding-left: 82px;
     box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.28);
+    flex-wrap: nowrap;
+    white-space: nowrap;
   }
 
   .desktop-footer .source-note,

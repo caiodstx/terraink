@@ -31,6 +31,16 @@
       href="/assets/apple-touch-icon.png"
     />
     <link rel="manifest" href="/site.webmanifest" />
+    <!-- LCP image for the landing hero — preloaded so the browser fetches
+         it before React parses/mounts and requests it the normal way.
+         Harmless no-op on routes that don't use it (/crear, /pedido/*). -->
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/examples/mockups/hero-valencia.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
     <title>Póster de mapa personalizado de tu ciudad | Mapagrama</title>
 
     <!-- Primary SEO -->

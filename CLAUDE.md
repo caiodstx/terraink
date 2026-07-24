@@ -584,71 +584,106 @@ de Q4 al final — con margen real para no llegar tarde a diciembre.
       no suele publicar sus cortes reales con mucha antelación, mejor
       confirmar cerca de la fecha que adivinar ahora.
 
-### Fase 7.5 — Landing v2 (conversión)
+### Fase 7.5 — Landing v2 (conversión) ✅ COMPLETA (2026-07-24)
 
-Propuesta externa (Fable). Rama dedicada `feat/landing-v2`, rollback =
-revert del merge. Ficheros principales:
-`src/features/landing/ui/LandingPage.tsx`, `src/styles/landing.css`,
-`scripts/generate-city-pages.mjs`.
+Propuesta externa (Fable). Rama `feat/landing-v2`, rollback = revert del
+merge. Ficheros principales: `src/features/landing/ui/LandingPage.tsx`,
+`src/styles/landing.css`, `scripts/generate-city-pages.mjs`. Las 10 tareas
+se hicieron y desplegaron en orden, verificando cada una en producción
+antes de pasar a la siguiente.
 
-- [ ] **Hero con producto:** imagen de póster/mockup en el hero (2
-      columnas en desktop — texto izq, mockup dcha; en móvil, mockup
-      bajo el texto, ~40vh). Reutilizar `/assets/examples/mockups/`.
-      Preload de la imagen (`<link rel="preload">`, no lazy — es el
-      LCP). Éxito: LCP < 2.5s en móvil (Lighthouse), imagen visible en
-      el primer viewport.
-- [ ] **Franja de confianza** bajo el hero: "Pago seguro con Stripe ·
-      Impreso en España · Datos de OpenStreetMap" — texto plano con
-      separadores, sin logos de terceros (marca registrada). Éxito:
-      visible sin scroll en móvil 390px.
-- [ ] **Reubicar `EmailCaptureBanner`:** de justo después del hero a
-      justo antes de la sección FAQ. Sin cambios en el componente.
-      Éxito: sigue disparando `email_capture_shown`; comparar tasa de
-      captura a 7 días vista (usar `funnel:report`).
-- [ ] **Fusionar ejemplos + mockups** en una sola sección "Ejemplos" (3
-      tarjetas ciudad, póster+mockup en par) + segunda fila: Gijón en 3
-      temas de color (midnight/terracota/claro), título "Un mapa,
-      infinitos estilos" — renders generados con el motor propio.
-      Éxito: sección única, 6 tarjetas, sin imágenes duplicadas.
-- [ ] **Sección de reseñas:** solo se renderiza con ≥2 reseñas reales
-      disponibles (texto + ciudad + estrellas) — flag por longitud del
-      array. Con ≥3 reseñas y nota, añadir `aggregateRating` a
-      `PRODUCT_SCHEMA` (`ratingValue`, `reviewCount`). Éxito: schema
-      válido en validator.schema.org sin warnings.
-- [x] ~~Jerarquía del H1 / `<title>` / meta keywords~~ — el `<title>`
-      ("Póster de mapa personalizado de tu ciudad | Mapagrama"),
-      `og:title`/`twitter:title` y la eliminación de `<meta
-      name="keywords">` ya están hechos y desplegados (2026-07-24, ver
-      más arriba). **Queda pendiente solo la reestructuración
-      visual del hero:** eyebrow pequeño "Tu ciudad, convertida en un
-      póster." + H1 "Póster de mapa personalizado de tu ciudad".
-      Éxito: un solo H1 en la página.
-- [ ] **Lista de ciudades colapsada:** `landing-cities` dentro de
-      `<details><summary>Ver todas las ciudades</summary>` — los `<a>`
-      se quedan en el DOM (SEO intacto). Éxito: enlaces presentes en
-      el HTML servido (`curl | grep`).
-- [ ] **CTA sticky móvil:** barra inferior fija (solo <768px) "Crear mi
-      mapa — desde 29€" → `/crear`. Se oculta cuando el hero-cta está
-      en viewport (IntersectionObserver) y en `/crear`. Éxito: no tapa
-      contenido interactivo, respeta `safe-area-inset-bottom` (iPhone).
-- [ ] **Pre-render de la landing** (la tarea grande, deliberadamente al
-      final de esta rama — la más delicada por hidratación/rutas, así
-      los cambios de conversión no quedan bloqueados si se atasca).
-      Extender `generate-city-pages.mjs` para renderizar `LandingPage`
-      a HTML estático dentro del `index.html` del build
-      (`renderToStaticMarkup` o plugin de prerender de Vite), con
-      hidratación de la SPA encima. Mismo cuidado ya acordado:
-      verificar a fondo que el flujo de pago (redirects de Stripe a
-      `/pedido/gracias` y `/pedido/cancelado`) sigue intacto antes de
-      darlo por bueno. Éxito: `curl -s https://mapagrama.com/ | grep
-      "Póster de mapa personalizado"` devuelve contenido; Lighthouse
-      SEO 100.
-- [ ] Al desplegar cualquier ítem de esta rama: push a
-      `caiodstx/terraink` (AGPL) en el mismo deploy, no después —
-      confirmado hoy que `main` puede quedarse semanas desincronizado
-      si no se hace a la vez (ver "SEO técnico pendiente" arriba).
-      Automatizar si es posible (hook post-deploy que haga el push) en
-      vez de confiar en acordarse cada vez.
+- [x] **Hero con producto:** `landing-hero` pasa a grid 2 columnas
+      (`landing-hero-copy` / `landing-hero-media`) con el mockup de Madrid
+      de `/assets/examples/mockups/`; en móvil (`@media max-width:768px`)
+      se apila con `max-height: 40vh`. `<link rel="preload" as="image"
+      type="image/webp" fetchpriority="high">` en `index.html` apuntando
+      al mismo webp — es lo que de verdad mueve la prioridad de fetch, no
+      el atributo `fetchPriority` en el `<img>` (quitado: React 18 en
+      runtime no lo reconoce en camelCase y la versión lowercase que sí
+      escribe en el DOM no la aceptan los tipos de `@types/react` v19
+      instalados — desajuste de versión pre-existente en el proyecto).
+- [x] **Franja de confianza:** `<p class="landing-trust-strip">` entre
+      hero y `EmailCaptureBanner`, margin negativo para pegarla al hero
+      sin heredar el gap de 64px del layout de la página.
+- [x] **`EmailCaptureBanner` reubicado:** de justo tras el hero a justo
+      antes de FAQ.
+- [x] **Ejemplos + mockups fusionados:** una sola sección con
+      `landing-example-pair` (mockup+póster lado a lado por tarjeta) y una
+      fila nueva "Un mapa, infinitos estilos" con Gijón en 3 temas reales
+      del sistema (`midnight_blue`, `terracotta`, `carrara` — "claro" es
+      Carrara, mármol blanco, el tema claro más neutro del catálogo).
+      Para generarlos hizo falta soporte nuevo de `theme` en el deep-link
+      (`cityDeepLink.ts` + `useGeolocation.ts`, `?theme=<id>` además de
+      `lat/lon/city/country`) — reutilizable directamente por el
+      `/estilo/<slug>` de Fase 7. Script nuevo
+      `scripts/render-style-examples.mjs` (`bun run render:styles`),
+      mismo pipeline real (puppeteer + `bun run dev` + el motor propio)
+      que `render-city-posters.mjs`; `process:examples` ya existente los
+      recoge sin cambios. Nota pendiente del usuario: el mockup de Madrid
+      ahora aparece dos veces (hero + esta sección) por límite de assets
+      (solo 3 mockups reales existen) — aceptado, no bloqueante.
+- [x] **Sección de reseñas:** `src/data/reviews.ts` (fuente única,
+      `REVIEWS: Review[]`, vacío por defecto — nunca testimonios
+      inventados) + `ReviewsSection.tsx`, no renderiza nada con <2
+      entradas. `aggregateRating` en `PRODUCT_SCHEMA` solo desde 3.
+      **Ahora mismo no hay reseñas reales cargadas** (tienda con 2 días de
+      vida) — la sección existe pero no se ve hasta que se añadan datos
+      reales a `reviews.ts`.
+- [x] **Jerarquía H1:** eyebrow `<p class="landing-hero-eyebrow">Tu
+      ciudad, convertida en un póster.</p>` + `<h1>Póster de mapa
+      personalizado de tu ciudad</h1>` (el `<title>`/meta ya estaban
+      hechos desde el punto anterior de esta sesión).
+- [x] **Lista de ciudades colapsada:** `landing-cities-list` dentro de
+      `<details><summary>Ver todas las ciudades</summary>` — los 72 `<a>`
+      siguen en el DOM siempre, solo cambia la visibilidad.
+- [x] **CTA sticky móvil:** `StickyMobileCta.tsx`, `IntersectionObserver`
+      sobre un `ref` al CTA real del hero — no un sentinel aparte. Se
+      oculta en `/crear` de forma automática (el componente solo vive
+      dentro de `LandingPage`, que solo se monta en `/`), no hizo falta
+      lógica de ruta explícita.
+- [x] **Pre-render de la landing** — la pieza grande, hecha con más
+      cuidado del previsto porque `LandingPage` usa `<Link>` (necesita
+      Router activo) e importa código que solo resuelve dentro del
+      pipeline de Vite (`import.meta.env.VITE_*`, alias `@/`) — no se
+      podía renderizar con un script suelto de Bun como los de ciudades.
+      Solución real: build SSR de Vite aparte.
+      - `src/entry-server.tsx`: `renderToStaticMarkup(<StaticRouter
+        location="/"><LandingPage/></StaticRouter>)` — en react-router-dom
+        v7 `StaticRouter` se re-exporta desde el entry principal, no
+        existe el subpath `/server`.
+      - `bun run build` ahora encadena 4 pasos: `generate-city-pages.mjs`
+        → `vite build` (cliente) → `vite build --ssr
+        src/entry-server.tsx --outDir dist-ssr` → `scripts/
+        prerender-landing.mjs`, que copia el `dist/index.html` ya
+        construido a `dist/app-shell.html` (shell vacío intacto) y solo
+        *entonces* inyecta el HTML del SSR dentro del `#root` del
+        `index.html` original.
+      - `nginx.conf`: `location = /` (match exacto, máxima prioridad)
+        sirve `index.html` con contenido real; `location /` (todo lo
+        demás — `/crear`, `/pedido/gracias`, `/pedido/cancelado`) cae a
+        `app-shell.html`, el shell vacío de siempre.
+      - El cliente sigue haciendo `createRoot(...).render()`, no
+        `hydrateRoot()` — **verificado con Puppeteer real** (local contra
+        `vite preview` y luego contra producción) que esto reemplaza el
+        HTML pre-renderizado por completo en el primer render sin
+        duplicar nada (`root.children.length === 1` en ambas rutas) y sin
+        errores de consola, incluso en el peor caso probado a propósito
+        (servir por error el `index.html` con contenido de landing en la
+        ruta `/crear` — React igualmente lo sustituye limpio por el
+        editor real). En producción: `/` sirve el hero real en HTML
+        crudo, `/crear`/`/pedido/gracias`/`/pedido/cancelado` siguen
+        vacíos (verificado con `curl | grep 'class="landing-hero"'` → 1
+        vs 0 en cada ruta) — el redirect de Stripe tras el pago no se vio
+        afectado.
+- [x] Automatización del push AGPL: `scripts/deploy-frontend.sh` (`bun
+      run deploy`) — un solo comando hace typecheck, sync+build+restart
+      en el VPS, `git push` de la rama actual y, si no es `main`, merge
+      `--no-ff` + push de `main` también. Aborta si hay cambios sin
+      commitear (para que lo empujado a GitHub coincida siempre con lo
+      desplegado). No es un hook real post-deploy porque el despliegue en
+      sí ya es manual (tar por SSH, sin CI ni git en el VPS) — este
+      script sustituye la secuencia de pasos sueltos por uno solo, que es
+      lo que de verdad hacía falta para no olvidarlo.
 
 ## Convenciones de trabajo
 

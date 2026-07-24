@@ -8,19 +8,12 @@ import { trackEvent } from "@/core/services";
 import { CITIES } from "@/data/cities";
 import { GIFT_INTENTS } from "@/data/giftIntents";
 import { REVIEWS } from "@/data/reviews";
+import { STYLES } from "@/data/styles";
 
 const EXAMPLE_CITIES = [
   { city: "Madrid", image: "madrid" },
   { city: "Barcelona", image: "barcelona" },
   { city: "Gijón", image: "gijon" },
-];
-
-// Same city (Gijón), 3 themes — see scripts/render-style-examples.mjs.
-// ids match src/data/themes.json.
-const STYLE_EXAMPLES = [
-  { theme: "midnight_blue", label: "Midnight" },
-  { theme: "terracotta", label: "Terracota" },
-  { theme: "carrara", label: "Claro" },
 ];
 
 const WHY_CARDS = [
@@ -199,18 +192,18 @@ export default function LandingPage() {
         <div className="landing-styles">
           <h3>Un mapa, infinitos estilos</h3>
           <div className="landing-styles-grid">
-            {STYLE_EXAMPLES.map(({ theme, label }) => (
-              <div key={theme} className="landing-style-card">
+            {STYLES.map(({ slug, themeId, name }) => (
+              <a key={slug} href={`/estilo/${slug}/`} className="landing-style-card">
                 <picture>
-                  <source srcSet={`/assets/examples/gijon-${theme}.webp`} type="image/webp" />
+                  <source srcSet={`/assets/examples/gijon-${themeId}.webp`} type="image/webp" />
                   <img
-                    src={`/assets/examples/gijon-${theme}.jpg`}
-                    alt={`Póster de mapa de Gijón, estilo ${label}`}
+                    src={`/assets/examples/gijon-${themeId}.jpg`}
+                    alt={`Póster de mapa de Gijón, estilo ${name}`}
                     loading="lazy"
                   />
                 </picture>
-                <p className="landing-style-caption">{label}</p>
-              </div>
+                <p className="landing-style-caption">{name}</p>
+              </a>
             ))}
           </div>
         </div>

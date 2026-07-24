@@ -13,6 +13,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { CITIES } from "../src/data/cities.ts";
 import { GIFT_INTENTS } from "../src/data/giftIntents.ts";
+import { STYLES } from "../src/data/styles.ts";
 
 const SITE_URL = "https://mapagrama.com";
 // The only 3 cities with a real poster-in-a-room photo (Smartmockups, shot
@@ -322,6 +323,144 @@ function giftPageHtml(gift) {
 `;
 }
 
+// A curated subset of the editor's ~27 named themes (src/data/styles.ts)
+// gets its own SEO page + a deep-link that pre-selects the theme — same
+// pattern as pageHtml()/giftPageHtml(), preview image from
+// render-style-examples.mjs (all 8 rendered on Gijón, so the deep-link
+// below starts there too — it's literally the same render they're
+// looking at, not a different city than the preview implies).
+function stylePageHtml(style) {
+  const canonical = `${SITE_URL}/estilo/${style.slug}/`;
+  const ogImage = `${SITE_URL}/assets/examples/gijon-${style.themeId}.jpg`;
+  const editorUrl = `/crear?${new URLSearchParams({
+    lat: "43.5322",
+    lon: "-5.6611",
+    city: "Gijón",
+    country: "España",
+    theme: style.themeId,
+  })}`.replace(/&/g, "&amp;");
+  const otherStyles = STYLES.filter((s) => s.slug !== style.slug);
+
+  return `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <title>${style.metaTitle}</title>
+
+    <meta name="description" content="${style.description}" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Mapagrama" />
+    <link rel="canonical" href="${canonical}" />
+    <link rel="stylesheet" href="/assets/seo-landing.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap"
+    />
+
+    <meta name="theme-color" content="#0a1824" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mapagrama" />
+    <meta property="og:title" content="${style.metaTitle}" />
+    <meta property="og:description" content="${style.description}" />
+    <meta property="og:url" content="${canonical}" />
+    <meta property="og:image" content="${ogImage}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${style.metaTitle}" />
+    <meta name="twitter:description" content="${style.description}" />
+    <meta name="twitter:image" content="${ogImage}" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "${style.metaTitle}",
+        "description": "${style.description}",
+        "url": "${canonical}",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Mapagrama",
+          "url": "${SITE_URL}"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Mapagrama", "item": "${SITE_URL}/" },
+          { "@type": "ListItem", "position": 2, "name": "${style.title}", "item": "${canonical}" }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div class="seo-page">
+      <header class="seo-header">
+        <a href="/" class="seo-brand">
+          <img src="/assets/logo.svg" alt="" />
+          <span>Mapagrama</span>
+        </a>
+        <a href="${editorUrl}" class="seo-nav-cta">Crear mi mapa</a>
+      </header>
+
+      <section class="seo-hero">
+        <h1>${style.title}</h1>
+        <p>${style.pitch}</p>
+        <a href="${editorUrl}" class="seo-hero-cta">Diseñar en estilo ${style.name}</a>
+      </section>
+
+      <div class="seo-preview">
+        <img src="${ogImage}" alt="${style.title}" loading="lazy" />
+      </div>
+
+      <section class="seo-why">
+        <h2>Por qué Mapagrama</h2>
+        <div class="seo-why-grid">
+          ${WHY_CARDS.map(
+            (card) => `<div class="seo-why-card">
+            <strong>${card.title}</strong>
+            <p>${card.body}</p>
+          </div>`,
+          ).join("\n          ")}
+        </div>
+      </section>
+
+      <section class="seo-pricing">
+        <h2>Precios</h2>
+        <ul class="seo-pricing-list">
+          ${PRICE_ROWS.map(
+            (row) => `<li><span>${row.label}</span><span>${row.price}</span></li>`,
+          ).join("\n          ")}
+        </ul>
+        <a href="${editorUrl}" class="seo-hero-cta">Empieza a diseñar</a>
+      </section>
+
+      <nav class="seo-cities-nav">
+        <h2>Otros estilos</h2>
+        <ul>
+          ${otherStyles
+            .map((s) => `<li><a href="/estilo/${s.slug}/">${s.name}</a></li>`)
+            .join("\n          ")}
+        </ul>
+      </nav>
+
+      <footer class="seo-footer">
+        <p>© Mapagrama · <a href="/">mapagrama.com</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
+`;
+}
+
 // Real, static, non-modal shipping/returns page — Pinterest's merchant
 // review rejected the catalog for "return policy unclear/hard to find" and
 // "missing brand contact info". The actual content already existed
@@ -467,12 +606,20 @@ for (const gift of GIFT_INTENTS) {
   console.log(`generated ${dir}/index.html`);
 }
 
+for (const style of STYLES) {
+  const dir = `public/estilo/${style.slug}`;
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(`${dir}/index.html`, stylePageHtml(style));
+  console.log(`generated ${dir}/index.html`);
+}
+
 const today = new Date().toISOString().slice(0, 10);
 const sitemapUrls = [
   { loc: SITE_URL, priority: "1.0" },
   { loc: `${SITE_URL}/crear`, priority: "0.8" },
   ...CITIES.map((c) => ({ loc: `${SITE_URL}/mapa/${c.slug}/`, priority: "0.7" })),
   ...GIFT_INTENTS.map((g) => ({ loc: `${SITE_URL}/${g.slug}/`, priority: "0.7" })),
+  ...STYLES.map((s) => ({ loc: `${SITE_URL}/estilo/${s.slug}/`, priority: "0.7" })),
   { loc: `${SITE_URL}/envios-y-devoluciones/`, priority: "0.6" },
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

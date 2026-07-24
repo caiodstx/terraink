@@ -691,18 +691,72 @@ de Q4 al final — con margen real para no llegar tarde a diciembre.
       razonable para una dedicatoria corta tipo "Ana & Marc, 14.06.2024".
       Verificado con un render real (Barcelona): la dedicatoria aparece
       correctamente en cursiva, sin tapar ni desplazar la atribución OSM.
-- [ ] Lienzo (canvas) 30x40/50x70 vía Gelato: verificar UIDs, quote y
-      país de producción antes de tocar catálogo/BuyModal.
-- [ ] Formato 70x100 (póster y marco) si la producción/envío no come
-      el margen — verificar con `orders:quote` en la misma tanda que
-      el lienzo.
+**Revisión (2026-07-24):** en vez de construir el lienzo a ciegas
+(2+ SKUs, mockups, quotes, pruebas de calidad — coste real siendo un
+equipo de una persona — sin ninguna señal de demanda), se valida primero
+con una puerta falsa. Y sobre "empujar el de más margen": no es el que
+más margen deja por unidad, es margen × conversión — mientras no haya
+datos suficientes, se preselecciona el default correcto en vez de
+añadir más productos.
+
+- [x] BuyModal: Enmarcado 30x40 preseleccionado por defecto (antes
+      "Póster") con badge "Más vendido", reordenado primero en el
+      toggle. El botón de "Póster" pasa a llamarse "Solo póster" — dejar
+      claro que es la opción básica, no una alternativa neutra. Razón:
+      el enmarcado 30x40 es el mejor margen×conversión conocido (~49%
+      neto, producción en España) — preseleccionar el default correcto
+      mueve más dinero que añadir productos nuevos. El nudge "¿lo
+      prefieres enmarcado?" ya construido en el ítem anterior se sigue
+      mostrando igual, solo que ahora aparece menos (solo si el cliente
+      cambia manualmente a "Solo póster").
+- [x] Puerta falsa "Lienzo (canvas) — próximamente" en BuyModal
+      (`CanvasWaitlistCard.tsx`): botón que despliega un mini-formulario
+      de email + consentimiento RGPD, reutilizando `POST
+      /email-signups` de Fase 6 (nuevo campo opcional `source` —
+      `"canvas_waitlist"` además del `"banner"` por defecto — para no
+      mezclar el conteo con las altas del banner de la landing). Cada
+      alta dispara un evento propio `canvas_interest_captured` además
+      del `email_captured` general, para poder contar la demanda real
+      sin ambigüedad vía `funnel:report`. También regala el cupón
+      `welcome10` como cualquier otra alta — sin coste extra de
+      integración, y da un motivo para comprar algo ya existente
+      mientras esperan.
+      **Pendiente de decisión (revisar en 3-4 semanas):** con `bun run
+      funnel:report 30` dentro del contenedor `api`, comparar
+      `canvas_interest_captured` contra `buy_modal_opened` — si ronda el
+      10-15% o más, vale la pena construir el lienzo de verdad; si nadie
+      lo toca, la Fase entera queda descartada sin haber gastado tiempo
+      en catálogo/mockups/pruebas de calidad.
+- [x] Formato 70x100 — **investigado, decisión pendiente del usuario, sin
+      tocar catálogo todavía** (2026-07-24). UIDs reales verificados
+      contra la Product Catalog API (`flat_700x1000-mm-28x40-inch_200-
+      gsm-80lb-uncoated_4-0_ver` y su equivalente `framed_poster_...`
+      en madera natural) y quote real con `orders:quote` a una
+      dirección de Madrid:
+      - **Póster suelto:** 20,28€ + 8,89-10,67€ envío ≈ 29,17-30,95€,
+        **producción en España**. A un PVP de 59€ (mismo precio que el
+        enmarcado 30x40 actual) deja ~27,9€ margen neto (~47%) — pasa
+        el criterio de margen (>25€) con holgura y sin necesidad de
+        inventar un precio nuevo.
+      - **Enmarcado (madera natural):** 73,19€ + 19,30€ envío (DPD
+        internacional) ≈ 92,49€, **producción en Francia**. A 89€ (el
+        precio del enmarcado 50x70 actual) el margen sería *negativo* —
+        necesitaría venderse a ~129-139€ para superar los 25€ de
+        margen, un precio fuera del rango actual del catálogo (tope hoy:
+        89€). Francia cuenta como "UE cercana" por el propio criterio
+        (no lo descarta el criterio de producción), pero es una decisión
+        de precio nueva, no algo que el criterio resuelva solo — el
+        usuario prefirió no decidir todavía.
+- [ ] Lienzo (canvas) 30x40/50x70 vía Gelato — integración real
+      condicionada al resultado de la puerta falsa de arriba. No
+      empezar sin datos de demanda.
 - [ ] Tarjeta regalo digital (Stripe) con diseño imprimible en PDF.
       Fecha límite: lista en octubre como muy tarde (la compra de
       regalo de Navidad empieza a subir desde entonces).
 - [ ] Calendario Q4: fechas límite de envío navideño de Gelato ES/DE
-      visibles en la web desde noviembre. Último a propósito — Gelato
-      no suele publicar sus cortes reales con mucha antelación, mejor
-      confirmar cerca de la fecha que adivinar ahora.
+      visibles en la web desde el 1 de noviembre. Último a propósito —
+      Gelato no suele publicar sus cortes reales con mucha antelación,
+      mejor confirmar cerca de la fecha que adivinar ahora.
 
 ### Fase 7.5 — Landing v2 (conversión) ✅ COMPLETA (2026-07-24)
 

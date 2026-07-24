@@ -543,8 +543,28 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       vacío: no hay reseñas reales todavía. El email post-entrega de
       arriba es el mecanismo que las va a generar; cuando lleguen
       respuestas reales, añadirlas a mano a `reviews.ts`.
-- [ ] Uptime monitor externo (mapagrama.com + /api/catalog) y alerta
-      si un webhook Stripe/Gelato falla repetidamente.
+- [x] Alerta por email si un webhook de Stripe/Gelato falla repetidamente
+      (2026-07-24, `mapagrama-api`). `webhooks/stripe.ts` y
+      `webhooks/gelato.ts` capturan cualquier excepción del handler (R2/
+      Gelato caídos, dirección de envío ausente, etc.) y la registran
+      como evento `webhook_failed_<source>` en la tabla `events` — antes
+      se perdía en un 500 genérico sin dejar rastro, exactamente el tipo
+      de fallo silencioso que dejó un pedido real atascado en Fase 4.
+      Script nuevo `bun run alerts:check` (cron cada 15 min en el VPS,
+      mismo patrón que `backup:db`/`emails:review`): si hay 2+ fallos
+      del mismo origen en 30 minutos, manda un email a
+      `contacto@mapagrama.com` (la dirección con reenvío real
+      configurado), con cooldown de 60 min para no repetir el aviso
+      mientras el incidente sigue abierto. Probado de extremo a extremo
+      en local con 2 fallos `webhook_failed_stripe` sembrados a mano:
+      dispara el email real vía Resend en la primera pasada, el
+      cooldown suprime correctamente el aviso duplicado en la segunda.
+- [ ] Monitor de uptime externo (mapagrama.com + `/api/catalog`) —
+      pendiente del usuario: requiere crear una cuenta en un servicio de
+      terceros (UptimeRobot o Better Uptime, tier gratuito), algo que
+      Claude no puede hacer en su nombre. Debe ser genuinamente externo
+      para servir de algo — si el VPS o Cloudflare caen, nada alojado
+      ahí mismo puede avisar de ello.
 
 ### SEO técnico pendiente (auditoría externa, 2026-07-24)
 

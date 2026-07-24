@@ -954,6 +954,64 @@ intactos tamaños/precios/descuento de segunda ciudad/flujo de compra.
       cambian la preview al instante, vista frontal/pared, precio real
       59,00€ (enmarcado 30x40) y 47,20€ (segunda ciudad -20%)
       calculados correctamente contra el catálogo real.
+- [x] **Ronda de corrección post-despliegue (2026-07-24), tras feedback
+      real del usuario ("está algo roto"):**
+      1. **Fotos de marco con transparencia real:** las 3 fotos
+         originales (`marco_madera/negro/dorado.png`) no eran PNG con
+         alpha de verdad — el "hueco" era un fondo blanco liso
+         (~250,250,250) renderizado a propósito para parecer
+         transparente. El color-to-alpha usado para generar
+         transparencia real dejaba un halo de ruido visible sobre el
+         fondo oscuro de la app (más notable en el marco negro) — eso
+         es lo que el usuario vio como "roto". El usuario reexportó los
+         3 PNG con canal alfa real (`Format32bppArgb`, alpha=0 de
+         verdad en el hueco, confirmado programáticamente) — sustituyen
+         a los anteriores sin ningún procesado, solo reescalado a
+         640px de ancho.
+      2. **Miniaturas del selector de marco desalineadas:** las 3 fotos
+         `selector_*.png` (una foto de esquina distinta por color) no
+         compartían el mismo encuadre/zoom entre sí — se notaba al
+         verlas una junto a otra. Sustituidas por un recorte
+         programático de la esquina superior izquierda de los propios
+         `marco_*.png` (misma caja de recorte para los 3 colores, mismo
+         lienzo 1086×1448) compuesto sobre el navy de `--item-bg` —
+         ahora los 3 son pixel-consistentes entre sí por construcción,
+         ya no dependen de que las 3 fotos originales se hayan tomado
+         igual.
+      3. **Bug real en `border-image-slice`:** el valor del lado
+         inferior (7%) medía la distancia desde el borde inferior de
+         la imagen hasta donde el margen transparente exterior termina,
+         no hasta donde empieza el hueco central — con el PNG real
+         (que sí tiene ~100px de margen transparente por debajo de la
+         madera, cosa que el PNG viejo con color-to-alpha no tenía) ese
+         7% caía casi entero dentro del margen vacío, dejando el borde
+         inferior del marco visiblemente más fino que los otros tres al
+         renderizarse. Corregido a 12% (verificado con un escaneo fino
+         del canal alfa: el hueco empieza exactamente a 168px del borde
+         inferior sobre 1448px de alto = 11,6%). Los otros tres lados
+         no tenían este error — solo el inferior se midió mal la
+         primera vez.
+      4. **Recorte del texto "Impresión de alta calidad..." en
+         resoluciones intermedias (769-1024px de ancho, altura de
+         viewport ~950px):** la columna de preview (con `position:
+         sticky`) podía ser más alta que el área visible con scroll del
+         modal, recortando silenciosamente su última línea de texto sin
+         ninguna pista visual de que hiciera falta hacer scroll —
+         encontrado con medición real de `getBoundingClientRect()`, no
+         solo revisión visual. Dos cambios: el breakpoint de una sola
+         columna sube de 768px a 900px (por debajo de 900px todo el
+         cuerpo del modal escrolea junto, sin este problema), y la
+         altura máxima de la imagen en vista frontal baja de 50vh a
+         42vh para dejar más margen en viewports bajos también por
+         encima de los 900px.
+      5. Como las fotos de marco reemplazan ficheros con el mismo
+         nombre bajo `/assets/` (cache `immutable, max-age=1y` en
+         Cloudflare — ver [[feedback-cloudflare-immutable-asset-cache]]),
+         hizo falta una purga manual del usuario en el dashboard de
+         Cloudflare para que la producción sirviera los ficheros
+         nuevos — confirmado con `curl -I` (`cf-cache-status`/
+         `Last-Modified`) antes y después de la purga. Van ya tres
+         veces que este mismo patrón muerde un despliegue.
 
 ## Convenciones de trabajo
 

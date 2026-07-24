@@ -1398,6 +1398,107 @@ button.picker-modal-done:focus-visible {
   color: #ff9b8a;
 }
 
+.buy-modal-upsell {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px dashed rgba(201, 162, 39, 0.45);
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.08);
+  color: rgba(214, 234, 247, 0.85);
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.buy-modal-upsell strong {
+  color: #c9a227;
+}
+
+.buy-modal-second-city-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: rgba(214, 234, 247, 0.85);
+  cursor: pointer;
+}
+
+.buy-modal-second-city-toggle strong {
+  color: #c9a227;
+}
+
+.buy-modal-second-city {
+  margin-top: -4px;
+}
+
+.buy-modal-second-city-search {
+  position: relative;
+}
+
+.buy-modal-second-city-input {
+  width: 100%;
+}
+
+.buy-modal-second-city-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid rgba(151, 183, 207, 0.36);
+  border-radius: 10px;
+  background: rgba(9, 18, 27, 0.98);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.44);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 30;
+}
+
+.buy-modal-second-city-suggestions button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #dfebf6;
+  border-radius: 8px;
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.buy-modal-second-city-suggestions button:hover,
+.buy-modal-second-city-suggestions button:focus-visible {
+  background: rgba(69, 133, 169, 0.2);
+}
+
+.buy-modal-second-city-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.08);
+  font-size: 0.84rem;
+  color: rgba(214, 234, 247, 0.9);
+}
+
+.buy-modal-second-city-chip button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(214, 234, 247, 0.7);
+  font-size: 1.1rem;
+}
+
+.buy-modal-second-city-chip button:hover {
+  background: rgba(214, 234, 247, 0.1);
+}
+
 .buy-modal-cta {
   height: 48px;
   border: 1px solid rgba(165, 198, 221, 0.34);

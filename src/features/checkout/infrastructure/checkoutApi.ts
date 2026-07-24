@@ -59,14 +59,19 @@ export interface CheckoutSessionResult {
   url: string;
 }
 
+export interface CheckoutItemInput {
+  designId: string;
+  format: string;
+  variantId: string;
+}
+
 export async function createCheckoutSession(
-  designId: string,
-  format: string,
-  variantId: string,
+  primary: CheckoutItemInput,
+  secondItem?: CheckoutItemInput,
 ): Promise<CheckoutSessionResult> {
   const res = await fetchAdapter.post(
     `${API_BASE_URL}/checkout`,
-    JSON.stringify({ designId, format, variantId }),
+    JSON.stringify({ ...primary, ...(secondItem ? { secondItem } : {}) }),
     { headers: { "Content-Type": "application/json" } },
   );
   if (!res.ok) {

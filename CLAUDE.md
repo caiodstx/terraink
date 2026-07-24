@@ -859,6 +859,102 @@ antes de pasar a la siguiente.
       script sustituye la secuencia de pasos sueltos por uno solo, que es
       lo que de verdad hacía falta para no olvidarlo.
 
+### Fase 7.6 — Rediseño visual del modal de compra (2026-07-24)
+
+Petición del usuario con mockup adjunto: modal de compra más ancho, dos
+columnas en escritorio (preview grande a la izquierda, opciones a la
+derecha), marco realista dinámico al elegir "Enmarcado", vista
+frontal/pared, sin botón "Done", una sola columna en móvil. Mantener
+intactos tamaños/precios/descuento de segunda ciudad/flujo de compra.
+
+- [x] **Componentes nuevos:** `src/features/checkout/domain/
+      frameAssets.ts` (mapa centralizado color→asset, único sitio a
+      tocar para cambiar fotos de marco en el futuro),
+      `PosterFramePreview.tsx` (preview grande), `FrameColorCard.tsx`
+      reescrito (miniatura real en vez de swatch de color plano).
+      `PickerModal.tsx` ganó dos props no invasivas para otros
+      consumidores: `wide` (modal ancho) y `footer` (slot de footer
+      personalizado fuera del body con scroll — ver bug de layout más
+      abajo).
+- [x] **Marco realista con fotos reales, no CSS:** el usuario aportó
+      fotografía real de producto a mitad de la tarea (`marco_madera/
+      negro/dorado.png`, render de marco completo con hueco
+      transparente + fotos de esquina para el selector + foto de una
+      pared para "vista en pared") — sustituyó unas texturas SVG
+      placeholder que se habían hecho de partida. El marco se compone
+      con `border-image` sobre el `<img>` del póster: `border-image-
+      slice: 7% 14% 12% 14%` (asimétrico a propósito — la sombra del
+      render real cae más en la base que arriba, medido pixel a pixel
+      con un escaneo de canal alfa antes de decidir el valor). Los PNG
+      de marco tal cual los entregó el usuario **no tenían transparencia
+      real** (fondo blanco liso de 254,254,254 renderizado como si
+      fuera hueco) — se generó transparencia real con un script de
+      "color-to-alpha" (`scripts` no versionado, uno de usar y tirar en
+      el scratchpad de la sesión) antes de poder usarlos con
+      `border-image`; sin ese paso el hueco del marco se veía como un
+      rectángulo blanco sólido sobre el fondo oscuro de la app.
+      Assets finales en `public/assets/frames/*.png` (marco completo,
+      alpha real, ~300-500KB tras reescalar a 640px de ancho),
+      `public/assets/frame-selectors/*.jpg` (foto de esquina real,
+      fondo ya en el mismo azul marino de la marca — no necesitó
+      procesado, solo reescalado a 220px/JPEG) y `public/assets/
+      mockups/wall.jpg` (foto de salón real para "vista en pared",
+      1100px/JPEG).
+- [x] **Vista en pared:** ambiente fijo (la foto de salón de arriba)
+      con el póster/marco superpuesto en posición y tamaño fijos vía
+      CSS absoluto (no hay matching de perspectiva por diseño — el
+      usuario aceptó explícitamente que fuera un "ambiente fijo").
+- [x] **Bug de layout real (dos capas, ambas necesarias):**
+      1. `.picker-modal--wide` no se aplicaba pese a estar en el CSS —
+         el ancho ganador seguía siendo el de `.picker-modal` base
+         porque la regla wide llegó a existir pero el modal seguía
+         viéndose estrecho hasta confirmarlo visualmente con
+         Puppeteer; la causa real era la nº 2.
+      2. Sin `min-width: 0` en `.buy-modal-preview-col`/`-options-col`
+         (hijos de un grid `1fr 1fr`), el tamaño intrínseco del
+         `<img>` del thumbnail (grande, sin redimensionar) forzaba el
+         ancho de la columna por encima del espacio disponible, y
+         `overflow: hidden` del modal recortaba visualmente el póster
+         en vez de dejarlo encoger — se veía como si el póster
+         estuviera "con zoom" y cortado por los bordes. Confirmado con
+         capturas de Puppeteer antes/después en escritorio y móvil
+         (390-420px) — no se dio por bueno solo con la revisión visual
+         en un tamaño.
+- [x] **Footer fuera del área con scroll:** el precio total + botón de
+      compra vivían dentro del body scrolleable del modal (igual que
+      el resto de pasos). En móvil, con contenido suficiente para
+      necesitar scroll, un intento inicial de fijarlo con `position:
+      sticky` dentro del body scrolleable **se solapaba visualmente
+      encima de los pasos "Presentación"/"Marco"** (un sticky no
+      reserva hueco respecto a hermanos ya posicionados en el flujo
+      normal, solo se ancla al viewport de scroll) — solución real: el
+      nuevo prop `footer` de `PickerModal` saca el precio+CTA del
+      `.picker-modal-body` scrolleable a un contenedor hermano fuera
+      del scroll, visible siempre sin necesidad de sticky-hacks.
+      Verificado en producción real (no solo local): el precio en vivo
+      desde `/api/catalog` y el descuento de segunda ciudad (-20%)
+      calculan correctamente dentro del nuevo layout.
+- [x] Badge "Más vendido" del enmarcado 30x40 (Fase 7) corregido a
+      "Recomendado" durante este rediseño — autocorrección: no hay
+      datos de ventas reales que respalden "más vendido" (el único
+      pedido real de la tienda fue un póster sin marco), "Recomendado"
+      es una afirmación editorial defendible.
+- [x] Copy del envío: el mockup del usuario decía "Envío gratis a
+      partir de 50€" — descartado a propósito por inexacto, el
+      checkout no cobra envío aparte en ningún caso (ya incluido en el
+      precio, confirmado en el código) — el modal final dice "Envío
+      incluido" sin condición.
+- [x] Tamaño 70x100 se muestra en el selector pero deshabilitado
+      ("Próximamente") — decisión ya tomada en el punto anterior de
+      Fase 7 (investigado con `orders:quote` real, pendiente de precio
+      final, no forma parte de este rediseño).
+- [x] Verificado con Puppeteer en local y luego **en producción real**
+      tras desplegar (`https://mapagrama.com/crear`, capturas en
+      escritorio 1440px y móvil 400px): los 3 colores de marco
+      cambian la preview al instante, vista frontal/pared, precio real
+      59,00€ (enmarcado 30x40) y 47,20€ (segunda ciudad -20%)
+      calculados correctamente contra el catálogo real.
+
 ## Convenciones de trabajo
 
 - Idioma de código/comentarios: español en comentarios, inglés en

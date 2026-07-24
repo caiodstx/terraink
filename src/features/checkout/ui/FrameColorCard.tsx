@@ -1,15 +1,13 @@
 import type { FrameColor } from "../domain/types";
+import { FRAME_SELECTOR_URL, FRAME_COLOR_LABEL, FRAME_COLOR_TAGLINE } from "../domain/frameAssets";
 
+// Kept for external callers that only need the flat swatch color (none
+// currently do, but cheap to keep) — the card itself now shows a real
+// corner crop of the texture instead.
 export const FRAME_COLOR_SWATCH: Record<FrameColor, string> = {
   "natural-wood": "#c9a26b",
   black: "#1a1a1a",
   gold: "#c9a227",
-};
-
-const FRAME_COLOR_LABEL: Record<FrameColor, string> = {
-  "natural-wood": "Madera natural",
-  black: "Negro",
-  gold: "Dorado",
 };
 
 interface FrameColorCardProps {
@@ -23,7 +21,7 @@ export default function FrameColorCard({
   isSelected,
   onClick,
 }: FrameColorCardProps) {
-  const className = ["theme-card", isSelected ? "is-selected" : ""]
+  const className = ["buy-modal-frame-card", isSelected ? "is-selected" : ""]
     .filter(Boolean)
     .join(" ");
 
@@ -35,15 +33,20 @@ export default function FrameColorCard({
       aria-pressed={isSelected}
       aria-label={FRAME_COLOR_LABEL[frameColor]}
     >
-      <div className="theme-card-palette" aria-hidden="true">
-        <span
-          className="theme-card-swatch"
-          style={{ backgroundColor: FRAME_COLOR_SWATCH[frameColor] }}
-          title={FRAME_COLOR_LABEL[frameColor]}
-        />
-      </div>
-      <span className="theme-card-name-shadow" aria-hidden="true" />
-      <p className="theme-card-name">{FRAME_COLOR_LABEL[frameColor]}</p>
+      <span
+        className="buy-modal-frame-card-swatch"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `url(${FRAME_SELECTOR_URL[frameColor]})`,
+        }}
+      />
+      {isSelected ? (
+        <span className="buy-modal-frame-card-check" aria-hidden="true">
+          ✓
+        </span>
+      ) : null}
+      <p className="buy-modal-frame-card-name">{FRAME_COLOR_LABEL[frameColor]}</p>
+      <p className="buy-modal-frame-card-tagline">{FRAME_COLOR_TAGLINE[frameColor]}</p>
     </button>
   );
 }

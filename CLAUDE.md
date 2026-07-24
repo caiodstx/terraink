@@ -548,13 +548,107 @@ Dos hallazgos ya corregidos, uno queda pendiente a propósito:
       el `<head>` (title/description/OG/JSON-LD) ya es HTML estático real
       y no depende de JS, que es lo que más pesa para el snippet de
       búsqueda de Google. El hueco real es para bots que no ejecutan JS.
-      Arreglarlo bien (servir HTML estático real en `/` con React
-      montándose encima, shell vacío distinto para `/crear` y
-      `/pedido/*`) implica un build multi-entrada en Vite y tocar el
-      `nginx.conf` que enruta los redirects reales de Stripe tras el
-      pago — no es un cambio para hacer de pasada entre otras tareas.
-      Pendiente de dedicarle una sesión propia con verificación a fondo
-      del flujo de pago antes de darlo por bueno.
+      Movido a Fase 7.5 (último ítem de esa rama) — mismo cambio, ahora
+      con plan y contexto de conversión alrededor en vez de suelto.
+
+### Fase 7 — Catálogo y ticket medio (preparación Q4)
+
+Propuesta externa (Fable), reordenada aquí por impacto/dependencias: lo
+que afecta a todo el tráfico actual va primero, la investigación de
+producto nuevo en Gelato después (misma llamada a `orders:quote` sirve
+para los dos formatos, mejor hacerlo junto), y lo atado a fecha límite
+de Q4 al final — con margen real para no llegar tarde a diciembre.
+
+- [ ] 6-8 temas preset con nombre como puntos de partida en el editor +
+      landing SEO por estilo (`/estilo/<slug>`). Afecta a todo el
+      tráfico que entra en `/crear` desde ya, y abre superficie SEO
+      nueva con tiempo de sobra para indexar antes de la campaña de Q4.
+- [ ] Upsell en BuyModal: segunda ciudad -20% y upgrade a enmarcado.
+      Sube el ticket medio de cada compra actual, sin depender de
+      catálogo nuevo.
+- [ ] Línea de texto personalizable bajo coordenadas (dedicatoria/fecha).
+      Encaja con las landings de regalo ya publicadas
+      (`/regalo-aniversario`, `/regalo-pareja`, `/regalo-mudanza`) —
+      mejor tenerlo listo antes de la tarjeta regalo, que
+      previsiblemente lo reutiliza.
+- [ ] Lienzo (canvas) 30x40/50x70 vía Gelato: verificar UIDs, quote y
+      país de producción antes de tocar catálogo/BuyModal.
+- [ ] Formato 70x100 (póster y marco) si la producción/envío no come
+      el margen — verificar con `orders:quote` en la misma tanda que
+      el lienzo.
+- [ ] Tarjeta regalo digital (Stripe) con diseño imprimible en PDF.
+      Fecha límite: lista en octubre como muy tarde (la compra de
+      regalo de Navidad empieza a subir desde entonces).
+- [ ] Calendario Q4: fechas límite de envío navideño de Gelato ES/DE
+      visibles en la web desde noviembre. Último a propósito — Gelato
+      no suele publicar sus cortes reales con mucha antelación, mejor
+      confirmar cerca de la fecha que adivinar ahora.
+
+### Fase 7.5 — Landing v2 (conversión)
+
+Propuesta externa (Fable). Rama dedicada `feat/landing-v2`, rollback =
+revert del merge. Ficheros principales:
+`src/features/landing/ui/LandingPage.tsx`, `src/styles/landing.css`,
+`scripts/generate-city-pages.mjs`.
+
+- [ ] **Hero con producto:** imagen de póster/mockup en el hero (2
+      columnas en desktop — texto izq, mockup dcha; en móvil, mockup
+      bajo el texto, ~40vh). Reutilizar `/assets/examples/mockups/`.
+      Preload de la imagen (`<link rel="preload">`, no lazy — es el
+      LCP). Éxito: LCP < 2.5s en móvil (Lighthouse), imagen visible en
+      el primer viewport.
+- [ ] **Franja de confianza** bajo el hero: "Pago seguro con Stripe ·
+      Impreso en España · Datos de OpenStreetMap" — texto plano con
+      separadores, sin logos de terceros (marca registrada). Éxito:
+      visible sin scroll en móvil 390px.
+- [ ] **Reubicar `EmailCaptureBanner`:** de justo después del hero a
+      justo antes de la sección FAQ. Sin cambios en el componente.
+      Éxito: sigue disparando `email_capture_shown`; comparar tasa de
+      captura a 7 días vista (usar `funnel:report`).
+- [ ] **Fusionar ejemplos + mockups** en una sola sección "Ejemplos" (3
+      tarjetas ciudad, póster+mockup en par) + segunda fila: Gijón en 3
+      temas de color (midnight/terracota/claro), título "Un mapa,
+      infinitos estilos" — renders generados con el motor propio.
+      Éxito: sección única, 6 tarjetas, sin imágenes duplicadas.
+- [ ] **Sección de reseñas:** solo se renderiza con ≥2 reseñas reales
+      disponibles (texto + ciudad + estrellas) — flag por longitud del
+      array. Con ≥3 reseñas y nota, añadir `aggregateRating` a
+      `PRODUCT_SCHEMA` (`ratingValue`, `reviewCount`). Éxito: schema
+      válido en validator.schema.org sin warnings.
+- [x] ~~Jerarquía del H1 / `<title>` / meta keywords~~ — el `<title>`
+      ("Póster de mapa personalizado de tu ciudad | Mapagrama"),
+      `og:title`/`twitter:title` y la eliminación de `<meta
+      name="keywords">` ya están hechos y desplegados (2026-07-24, ver
+      más arriba). **Queda pendiente solo la reestructuración
+      visual del hero:** eyebrow pequeño "Tu ciudad, convertida en un
+      póster." + H1 "Póster de mapa personalizado de tu ciudad".
+      Éxito: un solo H1 en la página.
+- [ ] **Lista de ciudades colapsada:** `landing-cities` dentro de
+      `<details><summary>Ver todas las ciudades</summary>` — los `<a>`
+      se quedan en el DOM (SEO intacto). Éxito: enlaces presentes en
+      el HTML servido (`curl | grep`).
+- [ ] **CTA sticky móvil:** barra inferior fija (solo <768px) "Crear mi
+      mapa — desde 29€" → `/crear`. Se oculta cuando el hero-cta está
+      en viewport (IntersectionObserver) y en `/crear`. Éxito: no tapa
+      contenido interactivo, respeta `safe-area-inset-bottom` (iPhone).
+- [ ] **Pre-render de la landing** (la tarea grande, deliberadamente al
+      final de esta rama — la más delicada por hidratación/rutas, así
+      los cambios de conversión no quedan bloqueados si se atasca).
+      Extender `generate-city-pages.mjs` para renderizar `LandingPage`
+      a HTML estático dentro del `index.html` del build
+      (`renderToStaticMarkup` o plugin de prerender de Vite), con
+      hidratación de la SPA encima. Mismo cuidado ya acordado:
+      verificar a fondo que el flujo de pago (redirects de Stripe a
+      `/pedido/gracias` y `/pedido/cancelado`) sigue intacto antes de
+      darlo por bueno. Éxito: `curl -s https://mapagrama.com/ | grep
+      "Póster de mapa personalizado"` devuelve contenido; Lighthouse
+      SEO 100.
+- [ ] Al desplegar cualquier ítem de esta rama: push a
+      `caiodstx/terraink` (AGPL) en el mismo deploy, no después —
+      confirmado hoy que `main` puede quedarse semanas desincronizado
+      si no se hace a la vez (ver "SEO técnico pendiente" arriba).
+      Automatizar si es posible (hook post-deploy que haga el push) en
+      vez de confiar en acordarse cada vez.
 
 ## Convenciones de trabajo
 

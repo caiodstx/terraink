@@ -1386,16 +1386,15 @@ button.picker-modal-done:focus-visible {
 }
 
 /* The photographed frame is a full portrait render (real wood/metal
-   texture, background already keyed to transparent) sliced via
+   texture, genuine alpha transparency in the source PNG) sliced via
    border-image so only its border band is drawn — the transparent
    center is skipped, letting the poster <img> show through underneath.
    Slice values come from measuring the source photo's actual border
-   thickness (asymmetric: the render's drop shadow sits mostly at the
-   bottom, so that edge slices deeper than the top). */
+   thickness per edge (not perfectly symmetric in the source photo). */
 .poster-preview-frame img {
   display: block;
   max-width: min(340px, 40vw);
-  max-height: 50vh;
+  max-height: 42vh;
   width: auto;
   height: auto;
 }
@@ -1404,7 +1403,7 @@ button.picker-modal-done:focus-visible {
   border-style: solid;
   border-width: 28px;
   border-image-source: var(--frame-texture);
-  border-image-slice: 7% 14% 12% 14%;
+  border-image-slice: 11% 14% 12% 14%;
   border-image-width: 28px;
   border-image-repeat: stretch;
   box-sizing: content-box;
@@ -1717,10 +1716,16 @@ button.picker-modal-done:focus-visible {
   color: rgba(214, 234, 247, 0.55);
 }
 
-/* Single column on mobile: preview on top, config below, CTA reachable
-   without hunting — the 1fr/1fr grid above is a desktop-only luxury, at
-   narrow widths it squeezes every card's text into overlap. */
-@media (max-width: 768px) {
+/* Single column below 900px: preview on top, config below, CTA reachable
+   without hunting — the 1fr/1fr grid above is a desktop-only luxury. The
+   breakpoint sits well above the usual 768px because the sticky preview
+   column's own natural height (image + view toggle + print-info text)
+   already exceeds a narrow scroll body's viewport in the 769-900px range,
+   silently clipping the print-info text against the footer with no
+   visible scroll affordance — found via real measurements at 769px, not
+   just a visual guess. Single-column mode has no such ceiling since the
+   whole body scrolls as one column. */
+@media (max-width: 900px) {
   .buy-modal-layout {
     grid-template-columns: 1fr;
     gap: 16px;

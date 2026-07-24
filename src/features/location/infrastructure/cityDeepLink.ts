@@ -3,6 +3,8 @@ export interface CityDeepLink {
   lon: number;
   city: string;
   country: string;
+  /** Optional theme id (see src/data/themes.json) — e.g. from /estilo/<slug>. */
+  theme: string | null;
 }
 
 // Deep link from a city SEO landing page (see
@@ -21,5 +23,5 @@ export function readCityDeepLink(): CityDeepLink | null {
   if (!city || !country || !Number.isFinite(lat) || !Number.isFinite(lon)) {
     return null;
   }
-  return { lat, lon, city, country };
+  return { lat, lon, city, country, theme: params.get("theme") };
 }

@@ -1,15 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import FooterNote from "@/shared/ui/FooterNote";
 import EmailCaptureBanner from "./EmailCaptureBanner";
+import ReviewsSection from "./ReviewsSection";
+import StickyMobileCta from "./StickyMobileCta";
 import { trackEvent } from "@/core/services";
 import { CITIES } from "@/data/cities";
 import { GIFT_INTENTS } from "@/data/giftIntents";
+import { REVIEWS } from "@/data/reviews";
 
 const EXAMPLE_CITIES = [
   { city: "Madrid", image: "madrid" },
   { city: "Barcelona", image: "barcelona" },
   { city: "Gijón", image: "gijon" },
+];
+
+// Same city (Gijón), 3 themes — see scripts/render-style-examples.mjs.
+// ids match src/data/themes.json.
+const STYLE_EXAMPLES = [
+  { theme: "midnight_blue", label: "Midnight" },
+  { theme: "terracotta", label: "Terracota" },
+  { theme: "carrara", label: "Claro" },
 ];
 
 const WHY_CARDS = [
@@ -82,6 +93,19 @@ const PRODUCT_SCHEMA = {
     availability: "https://schema.org/InStock",
     url: "https://mapagrama.com/crear",
   },
+  // Only from 3 real reviews — Google requires aggregateRating to reflect
+  // genuine data, and ReviewsSection.tsx itself won't render below 2.
+  ...(REVIEWS.length >= 3
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: (
+            REVIEWS.reduce((sum, r) => sum + r.rating, 0) / REVIEWS.length
+          ).toFixed(1),
+          reviewCount: String(REVIEWS.length),
+        },
+      }
+    : {}),
 };
 
 const FAQ_SCHEMA = {
@@ -95,6 +119,8 @@ const FAQ_SCHEMA = {
 };
 
 export default function LandingPage() {
+  const heroCtaRef = useRef<HTMLAnchorElement>(null);
+
   useEffect(() => {
     trackEvent("landing_view");
   }, []);
@@ -112,25 +138,51 @@ export default function LandingPage() {
       </header>
 
       <section className="landing-hero">
-        <h1>Tu ciudad, convertida en un póster.</h1>
-        <p>
-          Elige tu ciudad, personaliza colores, capas y texto en un editor en
-          vivo, y recibe tu mapa impreso en casa. Producción en España.
-        </p>
-        <Link to="/crear" className="landing-hero-cta">
-          Empieza a diseñar
-        </Link>
+        <div className="landing-hero-copy">
+          <p className="landing-hero-eyebrow">Tu ciudad, convertida en un póster.</p>
+          <h1>Póster de mapa personalizado de tu ciudad</h1>
+          <p>
+            Elige tu ciudad, personaliza colores, capas y texto en un editor
+            en vivo, y recibe tu mapa impreso en casa. Producción en España.
+          </p>
+          <Link to="/crear" className="landing-hero-cta" ref={heroCtaRef}>
+            Empieza a diseñar
+          </Link>
+        </div>
+        <div className="landing-hero-media">
+          {/* Matches the preloaded LCP image in index.html (the <link
+              rel="preload"> there is what actually drives fetch priority)
+              — same file, no lazy loading here (it's above the fold on
+              first paint). */}
+          <picture>
+            <source srcSet="/assets/examples/mockups/hero-valencia.webp" type="image/webp" />
+            <img
+              src="/assets/examples/mockups/hero-valencia.jpg"
+              alt="Póster de mapa de Valencia enmarcado en una habitación"
+            />
+          </picture>
+        </div>
       </section>
 
-      <EmailCaptureBanner />
+      <p className="landing-trust-strip">
+        Pago seguro con Stripe · Impreso en España · Datos de OpenStreetMap
+      </p>
 
       <section className="landing-examples">
-        <h2>Algunos ejemplos</h2>
+        <h2>Ejemplos</h2>
         <div className="landing-examples-grid">
           {EXAMPLE_CITIES.map(({ city, image }) => (
             <div key={city} className="landing-example-card">
-              <div className="landing-example-preview">
-                <picture>
+              <div className="landing-example-pair">
+                <picture className="landing-example-pair-mockup">
+                  <source srcSet={`/assets/examples/mockups/${image}.webp`} type="image/webp" />
+                  <img
+                    src={`/assets/examples/mockups/${image}.jpg`}
+                    alt={`Póster de mapa de ${city} enmarcado en una habitación`}
+                    loading="lazy"
+                  />
+                </picture>
+                <picture className="landing-example-pair-poster">
                   <source srcSet={`/assets/examples/${image}.webp`} type="image/webp" />
                   <img
                     src={`/assets/examples/${image}.jpg`}
@@ -139,26 +191,28 @@ export default function LandingPage() {
                   />
                 </picture>
               </div>
+              <p className="landing-example-caption">{city}</p>
             </div>
           ))}
         </div>
-      </section>
 
-      <section className="landing-mockups">
-        <h2>En tu pared</h2>
-        <div className="landing-mockups-grid">
-          {EXAMPLE_CITIES.map(({ city, image }) => (
-            <div key={city} className="landing-mockup-card">
-              <picture>
-                <source srcSet={`/assets/examples/mockups/${image}.webp`} type="image/webp" />
-                <img
-                  src={`/assets/examples/mockups/${image}.jpg`}
-                  alt={`Póster de mapa de ${city} enmarcado en una habitación`}
-                  loading="lazy"
-                />
-              </picture>
-            </div>
-          ))}
+        <div className="landing-styles">
+          <h3>Un mapa, infinitos estilos</h3>
+          <div className="landing-styles-grid">
+            {STYLE_EXAMPLES.map(({ theme, label }) => (
+              <div key={theme} className="landing-style-card">
+                <picture>
+                  <source srcSet={`/assets/examples/gijon-${theme}.webp`} type="image/webp" />
+                  <img
+                    src={`/assets/examples/gijon-${theme}.jpg`}
+                    alt={`Póster de mapa de Gijón, estilo ${label}`}
+                    loading="lazy"
+                  />
+                </picture>
+                <p className="landing-style-caption">{label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -192,6 +246,8 @@ export default function LandingPage() {
         </ol>
       </section>
 
+      <ReviewsSection />
+
       <section className="landing-pricing">
         <h2>Precios</h2>
         <ul className="landing-pricing-list">
@@ -219,6 +275,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <EmailCaptureBanner />
+
       <section className="landing-faq">
         <h2>Preguntas frecuentes</h2>
         <dl className="landing-faq-list">
@@ -242,18 +300,25 @@ export default function LandingPage() {
 
       <section className="landing-cities" id="landing-cities">
         <h2>Pósters de mapa por ciudad</h2>
-        <ul className="landing-cities-list">
-          {CITIES.map(({ slug, name }) => (
-            <li key={slug}>
-              {/* Plain <a>, not <Link>: these are separate static pages
-                  outside the SPA router (see scripts/generate-city-pages.mjs). */}
-              <a href={`/mapa/${slug}/`}>Mapa de {name}</a>
-            </li>
-          ))}
-        </ul>
+        {/* <details> collapses the list visually, but every <a> stays in
+            the DOM either way — SEO/crawlers see the full list regardless
+            of open/closed state. */}
+        <details className="landing-cities-details">
+          <summary>Ver todas las ciudades</summary>
+          <ul className="landing-cities-list">
+            {CITIES.map(({ slug, name }) => (
+              <li key={slug}>
+                {/* Plain <a>, not <Link>: these are separate static pages
+                    outside the SPA router (see scripts/generate-city-pages.mjs). */}
+                <a href={`/mapa/${slug}/`}>Mapa de {name}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
 
       <FooterNote />
+      <StickyMobileCta targetRef={heroCtaRef} />
     </div>
   );
 }

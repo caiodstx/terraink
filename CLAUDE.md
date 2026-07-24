@@ -571,12 +571,14 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       vez de llamar a Resend — verificado localmente (imprime "DRY RUN",
       no manda nada) y en el VPS (sigue enviando de verdad, sin el aviso
       de dry-run).
-- [ ] Monitor de uptime externo (mapagrama.com + `/api/catalog`) —
-      pendiente del usuario: requiere crear una cuenta en un servicio de
-      terceros (UptimeRobot o Better Uptime, tier gratuito), algo que
-      Claude no puede hacer en su nombre. Debe ser genuinamente externo
-      para servir de algo — si el VPS o Cloudflare caen, nada alojado
-      ahí mismo puede avisar de ello.
+- [x] Monitor de uptime externo (2026-07-24): cuenta en UptimeRobot
+      (tier gratuito), dos monitores — `mapagrama.com` y
+      `/api/catalog` — con alertas por email. Configurado por el
+      usuario directamente en el dashboard de UptimeRobot (fuera del
+      alcance de Claude: requiere crear la cuenta de terceros). Con
+      esto se cierra el ítem de Fase 6 junto con la alerta de webhooks
+      fallando de más arriba — ambas mitades de "monitor externo +
+      alerta de webhooks" completas.
 
 ### SEO técnico pendiente (auditoría externa, 2026-07-24)
 

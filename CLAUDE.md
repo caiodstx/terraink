@@ -580,10 +580,31 @@ producto nuevo en Gelato después (misma llamada a `orders:quote` sirve
 para los dos formatos, mejor hacerlo junto), y lo atado a fecha límite
 de Q4 al final — con margen real para no llegar tarde a diciembre.
 
-- [ ] 6-8 temas preset con nombre como puntos de partida en el editor +
-      landing SEO por estilo (`/estilo/<slug>`). Afecta a todo el
-      tráfico que entra en `/crear` desde ya, y abre superficie SEO
-      nueva con tiempo de sobra para indexar antes de la campaña de Q4.
+- [x] 6-8 temas preset + landing SEO por estilo (2026-07-24). El editor
+      ya traía ~27 temas con nombre del fork original
+      (`src/data/themes.json` + `additional_themes.json`) — no hacía
+      falta crear presets nuevos, el trabajo real era curar 8 para darles
+      página propia: **Midnight Blue** (el look insignia de la marca),
+      Terracota, Carrara, Noir, Bosque, Océano, Atardecer, Blueprint
+      (`src/data/styles.ts`, mismo patrón dual Vite+bun que
+      `cities.ts`/`giftIntents.ts`).
+      - `/estilo/<slug>/` estático (`stylePageHtml()` en
+        `generate-city-pages.mjs`, mismo patrón que las páginas de
+        ciudad/regalo) — el CTA hace deep-link a `/crear` con el tema
+        pre-seleccionado, reutilizando el soporte de `?theme=` construido
+        en Fase 7.5 para el render batch. Verificado con Puppeteer contra
+        producción: el deep-link de estilo aplica el tema correcto en el
+        editor real (`/crear?...&theme=noir` → "Noir" seleccionado).
+      - Imagen de cada página: Gijón renderizada en ese tema
+        (`render-style-examples.mjs` extendido a los 8, ya no solo los 3
+        que salían en la landing — importa `STYLES` en vez de una lista
+        aparte, una sola fuente de verdad).
+      - La fila "Un mapa, infinitos estilos" de la landing (Fase 7.5)
+        pasa de 3 tarjetas mudas a las 8 completas, cada una enlazando a
+        su página — es la superficie de descubrimiento interna hacia las
+        8 páginas nuevas.
+      - `nginx.conf`: bloque `/estilo/` con el mismo cache de 1h que
+        `/mapa/`.
 - [ ] Upsell en BuyModal: segunda ciudad -20% y upgrade a enmarcado.
       Sube el ticket medio de cada compra actual, sin depender de
       catálogo nuevo.

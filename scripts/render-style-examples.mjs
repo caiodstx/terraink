@@ -1,8 +1,10 @@
-// Renders the same city (Gijón) in 3 different themes, for the landing's
-// "Un mapa, infinitos estilos" row (LandingPage.tsx) — same real render
-// pipeline as render-city-posters.mjs, just with a fixed city and a
-// `theme` deep-link param instead of one render per city (see
-// cityDeepLink.ts / useGeolocation.ts for how `theme` is read).
+// Renders the same city (Gijón) in every curated style from
+// src/data/styles.ts — used both by the landing's "Un mapa, infinitos
+// estilos" row (3 of them) and by each /estilo/<slug> SEO page's preview
+// image (all 8, generate-city-pages.mjs). Same real render pipeline as
+// render-city-posters.mjs, just with a fixed city and a `theme` deep-link
+// param instead of one render per city (see cityDeepLink.ts /
+// useGeolocation.ts for how `theme` is read).
 //
 // Requires `bun run dev` running locally first, same as render-city-posters.
 // Run: bun run render:styles
@@ -12,6 +14,7 @@
 // picks these up with no changes needed there.
 import puppeteer from "puppeteer-core";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { STYLES } from "../src/data/styles.ts";
 
 const CHROME_PATH =
   process.env.CHROME_PATH ?? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
@@ -19,8 +22,7 @@ const OUT_DIR = new URL("../assets-src/examples/", import.meta.url).pathname.rep
 const DEV_SERVER = process.env.DEV_SERVER_URL ?? "http://localhost:5173";
 
 const CITY = { name: "Gijón", lat: 43.5322, lon: -5.6611 };
-// ids from src/data/themes.json — midnight/terracota/claro per the landing copy.
-const THEMES = ["midnight_blue", "terracotta", "carrara"];
+const THEMES = STYLES.map((s) => s.themeId);
 
 mkdirSync(OUT_DIR, { recursive: true });
 

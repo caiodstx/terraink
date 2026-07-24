@@ -34,6 +34,9 @@ export function useGeolocation(dispatch: React.Dispatch<PosterAction>) {
           displayContinent: "Europe",
         },
       });
+      if (deepLink.theme) {
+        dispatch({ type: "SET_THEME", themeId: deepLink.theme });
+      }
       return;
     }
 

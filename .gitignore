@@ -4,6 +4,7 @@ package-lock.json
 
 # Build output
 dist/
+dist-ssr/
 
 # Original high-res source images (multi-MB) — web-sized derivatives live
 # in public/assets/examples/, regeneratable via DevExportBridge if needed.

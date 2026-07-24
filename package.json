@@ -6,13 +6,17 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "bunx --bun vite --host",
-    "build": "bun run scripts/generate-city-pages.mjs && bunx --bun vite build",
+    "build": "bun run scripts/generate-city-pages.mjs && bunx --bun vite build && bun run build:ssr && bun run prerender:landing",
+    "build:ssr": "bunx --bun vite build --ssr src/entry-server.tsx --outDir dist-ssr",
+    "prerender:landing": "bun run scripts/prerender-landing.mjs",
     "preview": "bunx --bun vite preview --host",
     "typecheck": "tsc --noEmit",
     "showcase:grid": "node scripts/combine-showcase-grid.mjs",
     "seo:cities": "bun run scripts/generate-city-pages.mjs",
     "render:cities": "bun run scripts/render-city-posters.mjs",
-    "process:examples": "bun run scripts/process-examples.mjs"
+    "render:styles": "bun run scripts/render-style-examples.mjs",
+    "process:examples": "bun run scripts/process-examples.mjs",
+    "deploy": "bash scripts/deploy-frontend.sh"
   },
   "dependencies": {
     "maplibre-gl": "^5.19.0",

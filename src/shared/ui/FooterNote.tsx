@@ -46,6 +46,14 @@ export default function FooterNote() {
             </a>
           )}
           {contactEmail && " | "}
+          {/* Real anchor, not a JS-modal button: this content needs to be
+              reachable by anything that doesn't execute JS (Pinterest's
+              merchant review rejected the catalog over exactly this — the
+              return policy only existed inside openLegalDoc's modal). See
+              scripts/generate-city-pages.mjs's shippingReturnsPageHtml. */}
+          <a className="source-link" href="/envios-y-devoluciones/">
+            Envíos y devoluciones
+          </a>{" | "}
           {availableLegalLinks.map(({ label, doc }) => (
             <span key={doc}>
               <button

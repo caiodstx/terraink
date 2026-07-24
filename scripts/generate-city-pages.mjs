@@ -322,12 +322,143 @@ function giftPageHtml(gift) {
 `;
 }
 
+// Real, static, non-modal shipping/returns page — Pinterest's merchant
+// review rejected the catalog for "return policy unclear/hard to find" and
+// "missing brand contact info". The actual content already existed
+// (designs.mapagrama.com/legal/{terms,withdrawal}.md, shown via a JS
+// LegalModal at mapagrama.com), but that's invisible to any reviewer that
+// doesn't execute JS, and it lived on a different subdomain besides. This
+// puts the same real policy (production/shipping timing, the art. 103.c
+// LGDCU no-14-day-withdrawal exemption for personalized goods, what
+// actually IS covered — damaged/defective/wrong item — and contact email)
+// on a real mapagrama.com URL, in plain HTML, linked from the footer and
+// the sitemap.
+function shippingReturnsPageHtml() {
+  const canonical = `${SITE_URL}/envios-y-devoluciones/`;
+  const title = "Envíos y devoluciones | Mapagrama";
+  const description =
+    "Cómo funciona la producción y el envío de tu póster, y qué hacer si algo va mal: plazos, devoluciones y cómo contactarnos.";
+
+  return `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <title>${title}</title>
+
+    <meta name="description" content="${description}" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Mapagrama" />
+    <link rel="canonical" href="${canonical}" />
+    <link rel="stylesheet" href="/assets/seo-landing.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap"
+    />
+    <meta name="theme-color" content="#0a1824" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "${title}",
+        "description": "${description}",
+        "url": "${canonical}",
+        "isPartOf": { "@type": "WebSite", "name": "Mapagrama", "url": "${SITE_URL}" }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="seo-page">
+      <header class="seo-header">
+        <a href="/" class="seo-brand">
+          <img src="/assets/logo.svg" alt="" />
+          <span>Mapagrama</span>
+        </a>
+        <a href="/crear" class="seo-nav-cta">Crear mi mapa</a>
+      </header>
+
+      <section class="seo-hero">
+        <h1>Envíos y devoluciones</h1>
+      </section>
+
+      <section class="seo-why">
+        <h2>Producción y envío</h2>
+        <div class="seo-why-grid">
+          <div class="seo-why-card">
+            <strong>Cómo se produce</strong>
+            <p>Cada póster se imprime bajo pedido, específicamente para ti, con nuestro proveedor de impresión Gelato — no existe stock previo. La producción empieza en cuanto se confirma el pago.</p>
+          </div>
+          <div class="seo-why-card">
+            <strong>Dónde se produce</strong>
+            <p>En centros de producción dentro de la Unión Europea (España para la mayoría de tamaños y acabados).</p>
+          </div>
+          <div class="seo-why-card">
+            <strong>Plazos de entrega</strong>
+            <p>Verás una estimación de entrega concreta para tu producto y dirección antes de pagar. Recibirás un email de confirmación cuando el pedido salga hacia tu casa.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="seo-why">
+        <h2>Devoluciones</h2>
+        <div class="seo-why-grid">
+          <div class="seo-why-card">
+            <strong>Producto personalizado: sin desistimiento de 14 días</strong>
+            <p>Al ser un producto confeccionado según tus especificaciones (ciudad, colores, capas y texto que tú eliges), el derecho de desistimiento de 14 días no aplica, conforme al artículo 103.c del Real Decreto Legislativo 1/2007 (Texto Refundido de la Ley General para la Defensa de los Consumidores y Usuarios). Te lo mostramos de forma expresa antes de completar el pago.</p>
+          </div>
+          <div class="seo-why-card">
+            <strong>Qué sí está cubierto</strong>
+            <p>Si tu póster llega dañado en el transporte, con un defecto de producción, o no corresponde a lo que compraste, escríbenos a <a href="mailto:contacto@mapagrama.com">contacto@mapagrama.com</a> con fotos del producto recibido, dentro de los 14 días siguientes a la entrega, y gestionamos la reimpresión o el reembolso que corresponda.</p>
+          </div>
+          <div class="seo-why-card">
+            <strong>Cancelar antes de producción</strong>
+            <p>Si necesitas cancelar, escríbenos cuanto antes. Si el pedido aún no ha entrado en producción, lo cancelamos y reembolsamos; una vez en producción, al ser ya una pieza personalizada en fabricación, no es posible cancelarlo.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="seo-why">
+        <h2>Contacto</h2>
+        <div class="seo-why-grid">
+          <div class="seo-why-card">
+            <strong>Mapagrama</strong>
+            <p>
+              <a href="mailto:contacto@mapagrama.com">contacto@mapagrama.com</a><br />
+              Ronda Exterior 31, bajo derecha, 33210 Gijón, Asturias, España
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="seo-footer">
+        <p>
+          Para el detalle legal completo, ver también nuestro
+          <a href="https://designs.mapagrama.com/legal/terms.md">Condiciones de Venta</a>
+          y
+          <a href="https://designs.mapagrama.com/legal/withdrawal.md">Política de Desistimiento</a>.
+        </p>
+        <p>© Mapagrama · <a href="/">mapagrama.com</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
+`;
+}
+
 for (const city of CITIES) {
   const dir = `public/mapa/${city.slug}`;
   mkdirSync(dir, { recursive: true });
   writeFileSync(`${dir}/index.html`, pageHtml(city));
   console.log(`generated ${dir}/index.html`);
 }
+
+mkdirSync("public/envios-y-devoluciones", { recursive: true });
+writeFileSync("public/envios-y-devoluciones/index.html", shippingReturnsPageHtml());
+console.log("generated public/envios-y-devoluciones/index.html");
 
 for (const gift of GIFT_INTENTS) {
   const dir = `public/${gift.slug}`;
@@ -342,6 +473,7 @@ const sitemapUrls = [
   { loc: `${SITE_URL}/crear`, priority: "0.8" },
   ...CITIES.map((c) => ({ loc: `${SITE_URL}/mapa/${c.slug}/`, priority: "0.7" })),
   ...GIFT_INTENTS.map((g) => ({ loc: `${SITE_URL}/${g.slug}/`, priority: "0.7" })),
+  { loc: `${SITE_URL}/envios-y-devoluciones/`, priority: "0.6" },
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -22,8 +22,12 @@ export const TEXT_ATTRIBUTION_Y_RATIO = 0.965;
 export const TEXT_EDGE_MARGIN_RATIO = 0.02;
 
 /** Fixed low-contrast opacity for the OSM attribution — legible up close,
- *  but visually part of the design rather than a standalone banner. */
-export const ATTRIBUTION_OPACITY = 0.6;
+ *  but visually part of the design rather than a standalone banner.
+ *  Deliberately below the dedication/coordinates lines' 0.75 (feedback
+ *  2026-07-24: attribution was reading more prominent than the actual
+ *  personal content above it) — still well within ODbL's "legible up
+ *  close" requirement, just not the most prominent line in the block. */
+export const ATTRIBUTION_OPACITY = 0.48;
 
 /** City text scales down when labels get long. */
 export const CITY_TEXT_SHRINK_THRESHOLD = 10;
@@ -33,7 +37,7 @@ export const CITY_FONT_MIN_PX = 110;
 export const COUNTRY_FONT_BASE_PX = 92;
 export const COORDS_FONT_BASE_PX = 58;
 export const DEDICATION_FONT_BASE_PX = 46;
-export const ATTRIBUTION_FONT_BASE_PX = 50;
+export const ATTRIBUTION_FONT_BASE_PX = 42;
 
 export function isLatinScript(text: string | undefined | null): boolean {
   if (!text) {

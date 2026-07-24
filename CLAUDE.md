@@ -559,6 +559,18 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       en local con 2 fallos `webhook_failed_stripe` sembrados a mano:
       dispara el email real vía Resend en la primera pasada, el
       cooldown suprime correctamente el aviso duplicado en la segunda.
+      **Incidente real el mismo día:** esa prueba local mandó un email
+      de "webhook de stripe fallando" de verdad a `contacto@mapagrama.com`
+      — `RESEND_API_KEY` es la misma clave real en todos los `.env`
+      (local y VPS), no hay clave de pruebas separada, así que aunque
+      los datos sembrados eran locales, el envío por Resend no lo era.
+      Confirmado contra la base de datos real de producción que no
+      había ningún fallo genuino. Arreglado con un guard por dominio en
+      `checkWebhookHealth.ts`: si `PUBLIC_API_URL` no contiene
+      `mapagrama.com`, el script solo imprime lo que habría enviado en
+      vez de llamar a Resend — verificado localmente (imprime "DRY RUN",
+      no manda nada) y en el VPS (sigue enviando de verdad, sin el aviso
+      de dry-run).
 - [ ] Monitor de uptime externo (mapagrama.com + `/api/catalog`) —
       pendiente del usuario: requiere crear una cuenta en un servicio de
       terceros (UptimeRobot o Better Uptime, tier gratuito), algo que

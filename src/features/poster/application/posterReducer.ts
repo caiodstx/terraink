@@ -35,6 +35,8 @@ export interface PosterForm {
   displayContinent: string;
   fontFamily: string;
   showPosterText: boolean;
+  /** Optional line under the coordinates — dedication/date, e.g. "Ana & Marc, 14.06.2024". */
+  dedicationText: string;
   includeCredits: boolean;
   includeLandcover: boolean;
   includeBuildings: boolean;

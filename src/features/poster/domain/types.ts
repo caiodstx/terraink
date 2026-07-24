@@ -25,6 +25,7 @@ export interface ExportOptions {
   displayContinent?: string;
   fontFamily: string;
   showPosterText: boolean;
+  dedicationText?: string;
   showOverlay?: boolean;
   includeCredits?: boolean;
   markers?: MarkerItem[];
@@ -42,5 +43,6 @@ export interface Typography {
   displayContinent?: string;
   fontFamily: string;
   showPosterText: boolean;
+  dedicationText?: string;
   includeCredits?: boolean;
 }

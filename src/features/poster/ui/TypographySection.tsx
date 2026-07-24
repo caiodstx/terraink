@@ -81,6 +81,17 @@ export default function TypographySection({
           </label>
         </div>
         <label>
+          Dedication (optional)
+          <input
+            className="form-control-tall"
+            name="dedicationText"
+            value={form.dedicationText}
+            onChange={onChange}
+            maxLength={40}
+            placeholder="Ana & Marc, 14.06.2024"
+          />
+        </label>
+        <label>
           Font
           <select
             className="form-control-tall"

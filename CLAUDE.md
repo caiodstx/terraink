@@ -657,11 +657,28 @@ de Q4 al final — con margen real para no llegar tarde a diciembre.
           completos. El webhook de expiración no disparó ningún email
           (sesión sin `customer_details`, como se espera al no haber
           llegado a la página de Stripe).
-- [ ] Línea de texto personalizable bajo coordenadas (dedicatoria/fecha).
-      Encaja con las landings de regalo ya publicadas
-      (`/regalo-aniversario`, `/regalo-pareja`, `/regalo-mudanza`) —
-      mejor tenerlo listo antes de la tarjeta regalo, que
-      previsiblemente lo reutiliza.
+- [x] Línea de texto personalizable bajo coordenadas (2026-07-24):
+      `form.dedicationText` nuevo (input "Dedication (optional)" en
+      `TypographySection.tsx`, 40 caracteres, junto a los campos de
+      ciudad/país mostrados). Se dibuja en cursiva entre las coordenadas
+      y la atribución OSM — `TEXT_DEDICATION_Y_RATIO = 0.9475` nueva en
+      `textLayout.ts`, a propósito sin mover `TEXT_ATTRIBUTION_Y_RATIO`
+      (0.965): la atribución obligatoria no se toca, la dedicatoria se
+      encaja en el hueco que ya había entre coordenadas y atribución.
+      Implementado en paralelo en las dos rutas de render que ya existían
+      separadas — `typography.ts` (canvas, exports) y
+      `PosterTextOverlay.tsx` (DOM, preview en vivo) — y enhebrado por
+      todos los sitios que ya pasaban `showPosterText`/`includeCredits`:
+      `useExport.ts` (las dos ramas, PNG y SVG), `layeredSvgExporter.ts`,
+      `secondCityExporter.ts` (la segunda ciudad del upsell hereda la
+      misma dedicatoria, mismo criterio que tema/tamaño/tipografía) y el
+      bridge de pruebas `mapagramaExportSecondCityAsync`. Sin límite de
+      ancho por medición en el canvas (igual que país/coordenadas, que
+      tampoco lo tienen) — el máximo de 40 caracteres del input es la
+      única protección contra desbordamiento, aceptado como límite
+      razonable para una dedicatoria corta tipo "Ana & Marc, 14.06.2024".
+      Verificado con un render real (Barcelona): la dedicatoria aparece
+      correctamente en cursiva, sin tapar ni desplazar la atribución OSM.
 - [ ] Lienzo (canvas) 30x40/50x70 vía Gelato: verificar UIDs, quote y
       país de producción antes de tocar catálogo/BuyModal.
 - [ ] Formato 70x100 (póster y marco) si la producción/envío no come

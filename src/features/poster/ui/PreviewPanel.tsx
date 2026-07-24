@@ -448,6 +448,7 @@ export default function PreviewPanel() {
             textColor={effectiveTheme.ui.text}
             landColor={effectiveTheme.map.land}
             showPosterText={form.showPosterText}
+            dedicationText={form.dedicationText}
             includeCredits={form.includeCredits}
             showOverlay={form.showMarkers}
           />

@@ -6,12 +6,14 @@ import {
   TEXT_DIVIDER_Y_RATIO,
   TEXT_COUNTRY_Y_RATIO,
   TEXT_COORDS_Y_RATIO,
+  TEXT_DEDICATION_Y_RATIO,
   TEXT_ATTRIBUTION_Y_RATIO,
   TEXT_EDGE_MARGIN_RATIO,
   ATTRIBUTION_OPACITY,
   CITY_FONT_BASE_PX,
   COUNTRY_FONT_BASE_PX,
   COORDS_FONT_BASE_PX,
+  DEDICATION_FONT_BASE_PX,
   ATTRIBUTION_FONT_BASE_PX,
   formatCityLabel,
   computeCityFontScale,
@@ -27,6 +29,7 @@ interface PosterTextOverlayProps {
   textColor: string;
   landColor: string;
   showPosterText: boolean;
+  dedicationText?: string;
   includeCredits: boolean;
   showOverlay: boolean;
 }
@@ -45,6 +48,7 @@ export default function PosterTextOverlay({
   textColor,
   landColor,
   showPosterText,
+  dedicationText,
   includeCredits,
   showOverlay,
 }: PosterTextOverlayProps) {
@@ -61,7 +65,9 @@ export default function PosterTextOverlay({
   const cityFontSize = `${toCqMin(CITY_FONT_BASE_PX) * computeCityFontScale(city)}cqmin`;
   const countryFontSize = `${toCqMin(COUNTRY_FONT_BASE_PX)}cqmin`;
   const coordsFontSize = `${toCqMin(COORDS_FONT_BASE_PX)}cqmin`;
+  const dedicationFontSize = `${toCqMin(DEDICATION_FONT_BASE_PX)}cqmin`;
   const attributionFontSize = `${toCqMin(ATTRIBUTION_FONT_BASE_PX)}cqmin`;
+  const trimmedDedication = dedicationText?.trim();
   const creditsColor = computeAttributionColor(textColor, landColor, showOverlay);
   const creditsOpacity = showOverlay ? 0.55 : 0.9;
 
@@ -106,6 +112,18 @@ export default function PosterTextOverlay({
           >
             {formatCoordinates(lat, lon)}
           </p>
+          {trimmedDedication && (
+            <p
+              className="poster-dedication"
+              style={{
+                fontFamily: bodyFont,
+                top: `${TEXT_DEDICATION_Y_RATIO * 100}%`,
+                fontSize: dedicationFontSize,
+              }}
+            >
+              {trimmedDedication}
+            </p>
+          )}
         </>
       )}
 

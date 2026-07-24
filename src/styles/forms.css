@@ -1414,6 +1414,11 @@ button.picker-modal-done:focus-visible {
   left: 50%;
   top: 28%;
   transform: translateX(-50%);
+  /* The front-view shadow (24px offset, 48px blur) reads as an obvious
+     synthetic rectangle pasted over a real photo — the wall.jpg already
+     has its own soft window-light shadows, so the overlay only needs a
+     faint contact shadow to sit believably instead of floating. */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
 }
 
 .poster-preview-stage.is-wall .poster-preview-frame img {

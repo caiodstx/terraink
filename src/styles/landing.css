@@ -144,6 +144,116 @@
   line-height: 1.55;
 }
 
+.email-capture-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 14px;
+  padding: 20px 22px;
+  background: var(--item-bg);
+}
+
+.email-capture-success {
+  color: rgba(214, 234, 247, 0.9);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.email-capture-code {
+  font-family: "Spline Sans Mono", monospace;
+  color: #c9a227;
+  letter-spacing: 0.02em;
+}
+
+.email-capture-copy {
+  color: var(--ink);
+  font-size: 0.94rem;
+}
+
+.email-capture-copy strong {
+  color: #c9a227;
+}
+
+.email-capture-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.email-capture-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.email-capture-submit {
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: none;
+  background: #c9a227;
+  color: #0a1824;
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.email-capture-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.email-capture-dismiss {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: rgba(214, 234, 247, 0.7);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.email-capture-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(214, 234, 247, 0.65);
+}
+
+.email-capture-consent input {
+  margin-top: 3px;
+}
+
+.email-capture-privacy-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(214, 234, 247, 0.85);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.email-capture-error {
+  margin: 0;
+  color: #e08a8a;
+  font-size: 0.82rem;
+}
+
 .landing-gifts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

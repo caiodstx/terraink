@@ -389,6 +389,142 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       ninguna ruta `/mapa/*` (cero riesgo de duplicar con las páginas
       estáticas).
 
+### Fase 6 — Conversión y retención
+
+- [x] Analítica de embudo (2026-07-24): eventos landing → /crear →
+      BuyModal → checkout → pago. Decisión: **Cloudflare Zaraz**, no Umami
+      autoalojado (cero infra nueva en el VPS de 1.9GB) ni GA4 (el fork
+      traía un wrapper de gtag.js + Consent Mode v2 sin usar — nunca tuvo
+      un `VITE_GA_MEASUREMENT_ID` real — eliminado en vez de activarlo,
+      para no tener que montar un banner de cookies real). Zaraz es
+      cookieless e inyectado automáticamente en el edge de Cloudflare al
+      activarlo por zona, sin `<script>` en `index.html`.
+      - `mapagrama/src/core/analytics/zarazAnalytics.ts` sustituye a
+        `gtagAnalytics.ts` (borrado) detrás del mismo
+        `trackEvent`/`setUserProperty` que ya usaban `useSessionAnalytics`
+        (`app_open`), `useExport` (`poster_exported`,
+        `time_to_first_export`, `export_failed`) y `useCheckout`
+        (`poster_purchase_exported` en el instante de crear la sesión de
+        checkout, `purchase_failed`) — instrumentación ya existente,
+        simplemente estaba enviando a un gtag inerte. Añadidos
+        `landing_view` (`LandingPage.tsx`) y `buy_modal_opened`
+        (`BuyModal.tsx`, al abrir el modal).
+      - `mapagrama-api`: tabla `events` (`db.ts`, `logEvent`/`queryFunnel`),
+        endpoint `POST /events` (`routes/events.ts`) — destino al que
+        apunta la Action de Zaraz para los pasos cliente. Protegido con un
+        secreto (`EVENTS_INGEST_SECRET`) que viaja como query param
+        (`?secret=`), no como header — la UI real del tool "HTTP Request"
+        de Zaraz no expone headers custom, solo Endpoint + Method, así que
+        el endpoint acepta el secreto y el nombre del evento por header
+        *o* por query string (`?secret=...&name=...`). El paso
+        `purchase_completed` se registra directo en `logEvent()` desde
+        `webhooks/stripe.ts` (server-side, no necesita rebote por Zaraz).
+        Script `bun run funnel:report [días]` — conteos por evento y día,
+        pensado para consultarlo por SSH, no un dashboard.
+      - **Configuración real en el dashboard de Zaraz** (más simple de lo
+        planeado inicialmente): no hace falta un Trigger+Action por
+        evento. Una única Action sobre el tool "HTTP Request", con
+        Desencadenar activadores = solo `All Tracks` (dispara con
+        cualquier `zaraz.track()`, cualquier nombre — quitado `Pageview`,
+        que no lleva nombre de evento), Endpoint =
+        `https://mapagrama.com/api/events?secret=<secreto>&name=` +
+        variable `{{ Nombre del evento }}` insertada al final vía el
+        selector "+", Method `POST`, "Include Event Properties" activado
+        (así las propiedades de cada `trackEvent(name, params)` —
+        `variant_id`, `price_cents`, `reason`, `layout`, `format`... —
+        viajan en el body y quedan guardadas en `props` sin código
+        adicional). Esta única Action cubre automáticamente cualquier
+        evento nuevo que se añada en el futuro con solo llamar a
+        `trackEvent()`, sin volver a tocar el dashboard.
+      - **Verificado en producción** con una visita real (móvil,
+        incógnito): `landing_view` → `app_open` → `buy_modal_opened` →
+        `poster_purchase_exported` registrados correctamente en la tabla
+        `events`, embudo completo hasta el arranque del checkout.
+- [x] Recuperación de carritos (2026-07-24): webhook
+      `checkout.session.expired` → email Resend con imagen del diseño
+      (designId en R2, aún en `pending/` porque nunca se pagó) y enlace que
+      recrea la sesión de checkout. El "a las 24h" sale gratis: es el
+      tiempo de expiración por defecto de una Checkout Session de Stripe,
+      no hay que programar nada aparte — el webhook ya dispara solo a esa
+      hora.
+      - `mapagrama-api/src/routes/webhooks/stripe.ts`: `handleExpired()`
+        nuevo, ramifica antes del filtro que solo dejaba pasar
+        `checkout.session.completed`. Solo puede recuperar sesiones donde
+        el cliente llegó a escribir su email antes de abandonar — si cerró
+        la pestaña antes de eso, Stripe no guarda nada que enlazar, no hay
+        nada que recuperar por email en ese caso.
+      - **Suscripción del webhook actualizada en Stripe** (vía API, no
+        dashboard): el endpoint solo tenía `checkout.session.completed`
+        habilitado — añadido `checkout.session.expired` sin tocar nada más
+        (`enabled_events` ahora incluye ambos).
+      - `mapagrama-api/src/routes/checkout.ts`: lógica de creación de
+        sesión extraída a `createSessionFor()`, reutilizada por
+        `POST /checkout` (compra normal) y la nueva
+        `GET /checkout/resume/:sessionId` (enlace del email — lee los
+        metadatos de la sesión expirada, crea una sesión nueva para el
+        mismo diseño/variante y redirige 302 directo a Stripe, sin pasar
+        por el frontend).
+      - Eventos nuevos en la tabla `events` (mismo sistema del ítem
+        anterior): `cart_recovery_email_sent`, `cart_recovery_clicked`.
+      - Verificado: typecheck limpio, `GET /checkout/resume/` con un id
+        inválido devuelve 410 como se espera. La verificación real de
+        principio a fin (email disparado a las 24h de un carrito real
+        abandonado) queda pendiente de que ocurra de forma orgánica — no
+        se puede forzar sin esperar el tiempo real de expiración de Stripe.
+      - **Bug de seguridad detectado y arreglado antes de desplegar** (el
+        usuario lo señaló al revisar el plan): la primera versión mandaba
+        en el email el archivo real de `pending/` — el PNG a 300dpi sin
+        marca de agua, exactamente el mismo que se manda a imprenta. El
+        enlace de recuperación habría regalado el archivo de calidad de
+        imprenta gratis a quien tuviera el email. Arreglado con una
+        variante nueva: `useExport.ts` gana el quality `"email-preview"`
+        (baja resolución + marca de agua, igual que la vista previa
+        gratuita, pero sin contar contra el límite de descargas gratis ni
+        disparar su analítica — es un artefacto interno del checkout, no
+        una acción del usuario). `useCheckout.ts` la genera y sube en
+        segundo plano tras la compra (best-effort, nunca bloquea el pago
+        si falla) a `POST /designs/:designId/preview` →
+        `pendingPreviewKey()` en R2 (`pending/{designId}-preview.png`,
+        clave distinta a la del archivo de compra). El email usa esa
+        clave, nunca `pendingKey()`.
+- [x] Captura de email (2026-07-24): banner "-10% primer pedido" en la
+      landing → cupón Stripe generado al vuelo → lista propia (tabla
+      `email_signups` en SQLite + `bun run emails:export` a CSV). RGPD:
+      checkbox de consentimiento sin marcar por defecto, obligatorio,
+      con enlace a la política de privacidad.
+      - `mapagrama-api/src/lib/discount.ts`: coupon `welcome10` (10%,
+        `duration: once`) creado de forma perezosa e idempotente
+        (retrieve-or-create, sin script de setup aparte). Cada alta de
+        email recibe su propio Promotion Code de un solo uso
+        (`MAPA10-XXXXXX`, `max_redemptions: 1`) — trazable/revocable
+        individualmente en el dashboard de Stripe, a diferencia de un
+        código único compartido. Reenviar el mismo email devuelve el
+        mismo código ya emitido en vez de crear uno nuevo cada vez
+        (`findEmailSignupByEmail`).
+      - `POST /email-signups` (`routes/emailSignups.ts`) exige
+        `consent: true` explícito en el body — no hay fallback de
+        "interés legítimo" para un código de descuento de marketing.
+      - `routes/checkout.ts`: `allow_promotion_codes: true` en la sesión
+        de Stripe — el cliente introduce el código en la propia página de
+        Stripe, sin tener que enhebrarlo por el frontend/BuyModal.
+      - `src/features/landing/ui/EmailCaptureBanner.tsx`: banner
+        descartable bajo el hero de la landing (no popup con exit-intent,
+        menos intrusivo), recuerda el descarte/alta en localStorage vía
+        `localStorageCache` — no vuelve a aparecer una vez descartado o
+        completado. Eventos `email_capture_shown/submitted/dismissed`
+        sumados a la analítica de embudo del ítem 1.
+      - Verificado en producción: alta real crea un Promotion Code válido
+        en Stripe (`livemode: true`, ligado al coupon `welcome10`,
+        `max_redemptions: 1`), reenviar el mismo email devuelve el mismo
+        código sin duplicar.
+- [ ] Email post-entrega (webhook delivered de Gelato, +5-7 días):
+      pedir reseña + foto del cuadro colgado. Incentivo: -15% en el
+      siguiente pedido.
+- [ ] Sección de reseñas/fotos reales de clientes en la landing
+      (con permiso explícito de uso de imagen).
+- [ ] Uptime monitor externo (mapagrama.com + /api/catalog) y alerta
+      si un webhook Stripe/Gelato falla repetidamente.
+
 ## Convenciones de trabajo
 
 - Idioma de código/comentarios: español en comentarios, inglés en

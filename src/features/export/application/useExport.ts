@@ -28,7 +28,7 @@ import { trackEvent, setUserProperty } from "@/core/services";
 const LOW_DPI = 72;
 const PURCHASE_DPI = 300;
 
-export type ExportQuality = "purchase" | "preview" | "thumbnail";
+export type ExportQuality = "purchase" | "preview" | "thumbnail" | "email-preview";
 
 export interface ExportRunOptions {
   /** Default true — set false to get the Blob back without saving it to disk. */
@@ -38,6 +38,13 @@ export interface ExportRunOptions {
    * "preview" forces PNG at LOW_DPI with a watermark (the free download).
    * "thumbnail" forces PNG at LOW_DPI with NO watermark (e.g. the frame
    * mockup in the buy modal — not meant to be saved/downloaded).
+   * "email-preview" forces PNG at LOW_DPI WITH a watermark, same pixels as
+   * "preview" but silent: doesn't count against the free-preview limit or
+   * fire download analytics, since it's an internal artifact (uploaded
+   * alongside a purchase for the cart-recovery email, never a user action
+   * in its own right) — see useCheckout.ts. Never serve the full-res
+   * purchase file in that email; it's the exact print-quality file with no
+   * watermark, so leaking its R2 URL would be a free full-quality download.
    */
   quality?: ExportQuality;
 }
@@ -128,7 +135,7 @@ export function useExport() {
       const quality = options?.quality ?? "purchase";
       const shouldDownload = options?.download ?? true;
       const effectiveFormat: ExportFormat = quality === "purchase" ? format : "png";
-      const shouldWatermark = quality === "preview";
+      const shouldWatermark = quality === "preview" || quality === "email-preview";
       // Only the free preview counts toward the lifetime download counter —
       // thumbnails are silent UI chrome, purchases are tracked separately
       // by the checkout flow (with variant/price context this hook lacks).

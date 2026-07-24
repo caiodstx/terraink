@@ -7,6 +7,11 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <!-- SVG for modern browsers, sized PNGs for fallback, apple-touch-icon for iOS -->
+    <!-- Real /favicon.ico too: Google and older browsers check that path
+         by convention independent of the <link> tags below — without a
+         real file there, it fell through to the SPA's index.html
+         (text/html, not an icon), so crawlers showed a generic icon. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
     <link
       rel="icon"
@@ -133,84 +138,13 @@
         }
       }
     </script>
-    <!-- Consent Mode v2 — must load before GA4 and AdSense -->
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-
-      // Default for the rest of the world: granted (no consent banner is
-      // shown outside regulated regions, so denying here would block GA/ads
-      // permanently for those visitors).
-      gtag("consent", "default", {
-        ad_storage: "granted",
-        ad_user_data: "granted",
-        ad_personalization: "granted",
-        analytics_storage: "granted",
-      });
-
-      // Stricter default for regulated regions (EEA + UK + Switzerland):
-      // denied until the user grants consent via the CMP banner. The
-      // region-scoped default takes precedence for these countries.
-      gtag("consent", "default", {
-        ad_storage: "denied",
-        ad_user_data: "denied",
-        ad_personalization: "denied",
-        analytics_storage: "denied",
-        wait_for_update: 500,
-        region: [
-          "AT",
-          "BE",
-          "BG",
-          "HR",
-          "CY",
-          "CZ",
-          "DK",
-          "EE",
-          "FI",
-          "FR",
-          "DE",
-          "GR",
-          "HU",
-          "IE",
-          "IT",
-          "LV",
-          "LT",
-          "LU",
-          "MT",
-          "NL",
-          "PL",
-          "PT",
-          "RO",
-          "SK",
-          "SI",
-          "ES",
-          "SE",
-          "IS",
-          "LI",
-          "NO",
-          "GB",
-          "CH",
-        ],
-      });
-    </script>
-
-    <!-- GA4 -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA_MEASUREMENT_ID%"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "%VITE_GA_MEASUREMENT_ID%", {
-        anonymize_ip: true,
-      });
-    </script>
+    <!-- Analytics: Cloudflare Web Analytics + Zaraz (funnel events), both
+         injected automatically at the Cloudflare edge when enabled for the
+         zone — no script tag needed here. Replaces an inert GA4 wrapper
+         (gtag.js + Consent Mode v2) that shipped from the original fork but
+         was never actually activated (no real measurement ID was ever set)
+         — removed rather than left dead, and its cookie-consent-banner
+         requirement avoided entirely by choosing cookieless tooling. -->
   </head>
   <body>
     <div id="root"></div>

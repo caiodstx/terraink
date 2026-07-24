@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PickerModal from "@/shared/ui/PickerModal";
 import { usePosterContext } from "@/features/poster/ui/PosterContext";
 import { getLayoutOption } from "@/features/layout/infrastructure/layoutRepository";
+import { trackEvent } from "@/core/services";
 import { useCatalog } from "../application/useCatalog";
 import { useCheckout } from "../application/useCheckout";
 import { useDesignThumbnail } from "../application/useDesignThumbnail";
@@ -29,6 +30,12 @@ export default function BuyModal({ open, onClose }: BuyModalProps) {
   const { variants, isLoading, error: catalogError } = useCatalog(open);
   const { purchase, isProcessing, error: purchaseError } = useCheckout();
   const thumbnailUrl = useDesignThumbnail(open);
+
+  useEffect(() => {
+    if (open) trackEvent("buy_modal_opened", { layout: state.form.layout });
+    // Fire only on the open transition, not on every layout change while open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const layoutOption = getLayoutOption(state.form.layout);
 

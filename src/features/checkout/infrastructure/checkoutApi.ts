@@ -25,6 +25,19 @@ export async function uploadDesign(blob: Blob): Promise<UploadDesignResult> {
   return res.json();
 }
 
+// Best-effort — see useCheckout.ts, callers should swallow failures here
+// rather than block the purchase over a recovery-email nicety.
+export async function uploadDesignPreview(designId: string, blob: Blob): Promise<void> {
+  const res = await fetchAdapter.post(
+    `${API_BASE_URL}/designs/${encodeURIComponent(designId)}/preview`,
+    blob,
+    { headers: { "Content-Type": "image/png" } },
+  );
+  if (!res.ok) {
+    throw new Error(`No se pudo subir la vista previa (${res.status}).`);
+  }
+}
+
 export interface OrderReferenceResult {
   found: boolean;
   reference?: string;

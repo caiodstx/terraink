@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useExport } from "@/features/export/application/useExport";
 import { trackEvent } from "@/core/services";
-import { uploadDesign, createCheckoutSession } from "../infrastructure/checkoutApi";
+import { uploadDesign, uploadDesignPreview, createCheckoutSession } from "../infrastructure/checkoutApi";
 import type { CatalogVariant } from "../domain/types";
 
 export function useCheckout() {
@@ -24,6 +24,14 @@ export function useCheckout() {
           variant_id: variant.id,
           price_cents: variant.priceCents,
         });
+
+        // Best-effort: powers the cart-recovery email's image (see
+        // webhooks/stripe.ts's handleExpired) with a watermarked, low-res
+        // copy — never the full-quality purchase file. A failure here must
+        // never block the actual purchase.
+        void exportPoster("png", { quality: "email-preview", download: false })
+          .then((previewBlob) => previewBlob && uploadDesignPreview(designId, previewBlob))
+          .catch(() => {});
 
         const { url } = await createCheckoutSession(designId, format, variant.id);
         window.location.href = url;

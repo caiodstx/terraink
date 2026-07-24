@@ -1,5 +1,8 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import FooterNote from "@/shared/ui/FooterNote";
+import EmailCaptureBanner from "./EmailCaptureBanner";
+import { trackEvent } from "@/core/services";
 import { CITIES } from "@/data/cities";
 import { GIFT_INTENTS } from "@/data/giftIntents";
 
@@ -92,6 +95,10 @@ const FAQ_SCHEMA = {
 };
 
 export default function LandingPage() {
+  useEffect(() => {
+    trackEvent("landing_view");
+  }, []);
+
   return (
     <div className="landing-page">
       <header className="landing-header">
@@ -114,6 +121,8 @@ export default function LandingPage() {
           Empieza a diseñar
         </Link>
       </section>
+
+      <EmailCaptureBanner />
 
       <section className="landing-examples">
         <h2>Algunos ejemplos</h2>

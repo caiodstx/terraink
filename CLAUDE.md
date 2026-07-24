@@ -525,6 +525,37 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
 - [ ] Uptime monitor externo (mapagrama.com + /api/catalog) y alerta
       si un webhook Stripe/Gelato falla repetidamente.
 
+### SEO técnico pendiente (auditoría externa, 2026-07-24)
+
+Revisión de otro asistente (Fable) sobre el estado del repo/producción.
+Dos hallazgos ya corregidos, uno queda pendiente a propósito:
+
+- [x] `main` (rama por defecto del repo público) estaba 50 commits por
+      detrás de lo desplegado — solo tenía el rebranding inicial de Fase 1.
+      Riesgo real de cumplimiento AGPL-3.0: quien clonara el repo por
+      defecto no veía el código correspondiente a lo que corre en
+      producción. Sincronizado con un merge de `feat/debrand-mapagrama` →
+      `main` y `git push`.
+- [x] `<title>` cambiado de "Mapagrama: Pósters de mapas personalizados" a
+      "Póster de mapa personalizado de tu ciudad | Mapagrama" (keyword
+      transaccional primero — así se busca, nadie busca "mapagrama"
+      todavía por marca). Mismo cambio en `og:title`/`twitter:title` por
+      consistencia. `<meta name="keywords">` eliminada (Google la ignora
+      desde 2009, solo sirve para revelar la estrategia SEO a quien mire
+      el código fuente).
+- [ ] **Pre-renderizado de la landing** (decidido explícitamente aplazar,
+      2026-07-24): el `<body>` de `/` está vacío hasta que React monta —
+      el `<head>` (title/description/OG/JSON-LD) ya es HTML estático real
+      y no depende de JS, que es lo que más pesa para el snippet de
+      búsqueda de Google. El hueco real es para bots que no ejecutan JS.
+      Arreglarlo bien (servir HTML estático real en `/` con React
+      montándose encima, shell vacío distinto para `/crear` y
+      `/pedido/*`) implica un build multi-entrada en Vite y tocar el
+      `nginx.conf` que enruta los redirects reales de Stripe tras el
+      pago — no es un cambio para hacer de pasada entre otras tareas.
+      Pendiente de dedicarle una sesión propia con verificación a fondo
+      del flujo de pago antes de darlo por bueno.
+
 ## Convenciones de trabajo
 
 - Idioma de código/comentarios: español en comentarios, inglés en

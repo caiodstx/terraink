@@ -1,10 +1,10 @@
 import { fetchAdapter } from "@/core/http/fetchAdapter";
 import { API_BASE_URL } from "@/core/config";
 
-export async function submitEmailSignup(email: string): Promise<string> {
+export async function submitEmailSignup(email: string, source?: string): Promise<string> {
   const res = await fetchAdapter.post(
     `${API_BASE_URL}/email-signups`,
-    JSON.stringify({ email, consent: true }),
+    JSON.stringify({ email, consent: true, ...(source ? { source } : {}) }),
     { headers: { "Content-Type": "application/json" } },
   );
   if (!res.ok) {

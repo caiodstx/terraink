@@ -1369,7 +1369,11 @@ button.picker-modal-done:focus-visible {
 }
 
 .buy-modal-kind-btn {
-  height: 40px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   border: 1px solid rgba(151, 183, 207, 0.42);
   border-radius: 10px;
   background: var(--item-bg);
@@ -1384,6 +1388,17 @@ button.picker-modal-done:focus-visible {
   background: rgba(231, 242, 250, 0.96);
   border-color: rgba(165, 198, 221, 0.6);
   color: #0d1f2e;
+}
+
+.buy-modal-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #c9a227;
+  color: #0a1824;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 .buy-modal-status {
@@ -1428,6 +1443,38 @@ button.picker-modal-done:focus-visible {
 
 .buy-modal-second-city {
   margin-top: -4px;
+}
+
+.buy-modal-canvas-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px dashed rgba(201, 162, 39, 0.45);
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.06);
+}
+
+.buy-modal-canvas-copy {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(214, 234, 247, 0.8);
+}
+
+.buy-modal-canvas-fields {
+  display: flex;
+  gap: 8px;
+}
+
+.buy-modal-canvas-fields input {
+  flex: 1;
+}
+
+.buy-modal-canvas-done {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(214, 234, 247, 0.7);
 }
 
 .buy-modal-second-city-search {

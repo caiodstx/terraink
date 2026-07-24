@@ -10,6 +10,7 @@ import { useCheckout } from "../application/useCheckout";
 import { useDesignThumbnail } from "../application/useDesignThumbnail";
 import { resolveVariantId } from "../domain/variantResolver";
 import FrameColorCard, { FRAME_COLOR_SWATCH } from "./FrameColorCard";
+import CanvasWaitlistCard from "./CanvasWaitlistCard";
 import type { FrameColor, PosterKind } from "../domain/types";
 
 const FRAME_COLORS: FrameColor[] = ["natural-wood", "black", "gold"];
@@ -27,7 +28,11 @@ interface BuyModalProps {
 
 export default function BuyModal({ open, onClose }: BuyModalProps) {
   const { state } = usePosterContext();
-  const [kind, setKind] = useState<PosterKind>("poster");
+  // Framed 30x40 is the best margin×conversion combo (España production,
+  // ~49% net margin) — preselected as the default rather than making
+  // people opt into the better option. Data point, not guesswork: revisit
+  // once real per-variant conversion numbers exist (funnel:report).
+  const [kind, setKind] = useState<PosterKind>("framed");
   const [frameColor, setFrameColor] = useState<FrameColor>("natural-wood");
 
   const [secondCityEnabled, setSecondCityEnabled] = useState(false);
@@ -126,19 +131,20 @@ export default function BuyModal({ open, onClose }: BuyModalProps) {
         <div className="buy-modal-kind-toggle">
           <button
             type="button"
-            className={`buy-modal-kind-btn${kind === "poster" ? " is-selected" : ""}`}
-            onClick={() => setKind("poster")}
-            aria-pressed={kind === "poster"}
-          >
-            Póster
-          </button>
-          <button
-            type="button"
             className={`buy-modal-kind-btn${kind === "framed" ? " is-selected" : ""}`}
             onClick={() => setKind("framed")}
             aria-pressed={kind === "framed"}
           >
             Enmarcado
+            <span className="buy-modal-badge">Más vendido</span>
+          </button>
+          <button
+            type="button"
+            className={`buy-modal-kind-btn${kind === "poster" ? " is-selected" : ""}`}
+            onClick={() => setKind("poster")}
+            aria-pressed={kind === "poster"}
+          >
+            Solo póster
           </button>
         </div>
 
@@ -154,6 +160,8 @@ export default function BuyModal({ open, onClose }: BuyModalProps) {
             ))}
           </div>
         ) : null}
+
+        <CanvasWaitlistCard />
 
         {framedUpgradeDeltaCents !== null ? (
           <button

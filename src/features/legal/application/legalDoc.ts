@@ -1,4 +1,4 @@
-export type LegalDocType = "privacy" | "imprint";
+export type LegalDocType = "privacy" | "imprint" | "terms" | "withdrawal";
 
 export const LEGAL_DOC_EVENT = "mapagrama:legal-doc";
 

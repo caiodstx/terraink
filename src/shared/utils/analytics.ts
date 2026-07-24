@@ -1,2 +1,2 @@
-/** UI-facing analytics gateway — re-exports the core gtag service. */
-export { trackEvent } from "@/core/analytics/gtagAnalytics";
+/** UI-facing analytics gateway — re-exports the core Zaraz service. */
+export { trackEvent } from "@/core/analytics/zarazAnalytics";

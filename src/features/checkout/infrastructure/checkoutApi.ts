@@ -1,0 +1,76 @@
+import { fetchAdapter } from "@/core/http/fetchAdapter";
+import { API_BASE_URL } from "@/core/config";
+import type { CatalogResponse } from "../domain/types";
+
+export async function fetchCatalog(): Promise<CatalogResponse> {
+  const res = await fetchAdapter.get(`${API_BASE_URL}/catalog`);
+  if (!res.ok) {
+    throw new Error(`No se pudo cargar el catálogo (${res.status}).`);
+  }
+  return res.json();
+}
+
+export interface UploadDesignResult {
+  designId: string;
+  format: string;
+}
+
+export async function uploadDesign(blob: Blob): Promise<UploadDesignResult> {
+  const res = await fetchAdapter.post(`${API_BASE_URL}/designs`, blob, {
+    headers: { "Content-Type": "image/png" },
+  });
+  if (!res.ok) {
+    throw new Error(`No se pudo subir el diseño (${res.status}).`);
+  }
+  return res.json();
+}
+
+// Best-effort — see useCheckout.ts, callers should swallow failures here
+// rather than block the purchase over a recovery-email nicety.
+export async function uploadDesignPreview(designId: string, blob: Blob): Promise<void> {
+  const res = await fetchAdapter.post(
+    `${API_BASE_URL}/designs/${encodeURIComponent(designId)}/preview`,
+    blob,
+    { headers: { "Content-Type": "image/png" } },
+  );
+  if (!res.ok) {
+    throw new Error(`No se pudo subir la vista previa (${res.status}).`);
+  }
+}
+
+export interface OrderReferenceResult {
+  found: boolean;
+  reference?: string;
+  status?: string;
+}
+
+export async function fetchOrderReference(sessionId: string): Promise<OrderReferenceResult> {
+  const res = await fetchAdapter.get(`${API_BASE_URL}/orders/by-session/${encodeURIComponent(sessionId)}`);
+  if (res.status === 404) {
+    return { found: false };
+  }
+  if (!res.ok) {
+    throw new Error(`No se pudo obtener el pedido (${res.status}).`);
+  }
+  return res.json();
+}
+
+export interface CheckoutSessionResult {
+  url: string;
+}
+
+export async function createCheckoutSession(
+  designId: string,
+  format: string,
+  variantId: string,
+): Promise<CheckoutSessionResult> {
+  const res = await fetchAdapter.post(
+    `${API_BASE_URL}/checkout`,
+    JSON.stringify({ designId, format, variantId }),
+    { headers: { "Content-Type": "application/json" } },
+  );
+  if (!res.ok) {
+    throw new Error(`No se pudo iniciar el pago (${res.status}).`);
+  }
+  return res.json();
+}

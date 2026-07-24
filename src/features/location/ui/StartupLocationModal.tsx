@@ -10,6 +10,7 @@ import { geocodeLocation, reverseGeocodeCoordinates } from "@/core/services";
 import { GEOLOCATION_TIMEOUT_MS } from "@/features/map/infrastructure";
 import {
   getGeolocationFailureMessage,
+  readCityDeepLink,
   requestCurrentPositionWithRetry,
 } from "@/features/location/infrastructure";
 import { MyLocationIcon } from "@/shared/ui/Icons";
@@ -18,7 +19,7 @@ import { useLocationAutocomplete } from "@/features/location/application/useLoca
 import type { SearchResult } from "@/features/location/domain/types";
 
 const CLOSE_ANIMATION_MS = 220;
-const DEFAULT_LOCATION_LABEL = "Hanover, Region Hannover, Lower Saxony, Germany";
+const DEFAULT_LOCATION_LABEL = "Madrid, Comunidad de Madrid, España";
 
 interface PendingLocation {
   label: string;
@@ -37,7 +38,11 @@ export default function StartupLocationModal({
   onComplete,
 }: StartupLocationModalProps) {
   const { dispatch } = usePosterDispatch();
-  const [isOpen, setIsOpen] = useState(true);
+  // Skipped entirely when arriving from a city SEO page's deep link
+  // (?lat=&lon=&city=&country=) — useGeolocation already applies that
+  // location, so asking again here would just override it back to Madrid
+  // the moment the user confirms an empty input.
+  const [isOpen, setIsOpen] = useState(() => !readCityDeepLink());
   const [isClosing, setIsClosing] = useState(false);
   const [locationInput, setLocationInput] = useState("");
   const [isInputFocused, setIsInputFocused] = useState(false);

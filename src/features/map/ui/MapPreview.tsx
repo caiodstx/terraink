@@ -108,6 +108,15 @@ export default function MapPreview({
 }: MapPreviewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isSyncing = useRef(false);
+  // The map is always constructed with whatever center/zoom props were
+  // present at first render, which can already be stale by the time
+  // construction settles (e.g. a deep link resolves to a different
+  // location right after mount, before this map's own initial "moveend"
+  // fires). That initial settle isn't a jumpTo we control, so isSyncing
+  // can't guard it — instead, ignore all moveend/move events until "load"
+  // fires once, by which point any real relocation has already been
+  // applied via jumpTo.
+  const hasLoadedRef = useRef(false);
   const hasMountedStyleRef = useRef(false);
   const prevStyleRef = useRef<StyleSpecification | null>(null);
   const onMoveEndRef = useRef(onMoveEnd);
@@ -130,13 +139,17 @@ export default function MapPreview({
 
     mapRef.current = map;
 
+    map.once("load", () => {
+      hasLoadedRef.current = true;
+    });
+
     map.on("moveend", () => {
-      if (isSyncing.current) return;
+      if (isSyncing.current || !hasLoadedRef.current) return;
       const currentCenter = map.getCenter();
       onMoveEndRef.current?.([currentCenter.lng, currentCenter.lat], map.getZoom());
     });
     map.on("move", () => {
-      if (isSyncing.current) return;
+      if (isSyncing.current || !hasLoadedRef.current) return;
       const currentCenter = map.getCenter();
       onMoveRef.current?.([currentCenter.lng, currentCenter.lat], map.getZoom());
     });

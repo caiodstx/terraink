@@ -4,9 +4,10 @@ import type { CanvasSize } from "../../domain/types";
 export function resolveCanvasSize(
   widthInches: number,
   heightInches: number,
+  dpi: number = OUTPUT_DPI,
 ): CanvasSize {
-  const requestedWidth = Math.max(600, Math.round(widthInches * OUTPUT_DPI));
-  const requestedHeight = Math.max(600, Math.round(heightInches * OUTPUT_DPI));
+  const requestedWidth = Math.max(600, Math.round(widthInches * dpi));
+  const requestedHeight = Math.max(600, Math.round(heightInches * dpi));
   const totalPixels = requestedWidth * requestedHeight;
 
   const areaFactor =

@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { fetchMarkdownDoc } from "@/core/services";
-import { PRIVACY_URL, LEGAL_NOTICE_URL } from "@/core/config";
+import {
+  PRIVACY_URL,
+  LEGAL_NOTICE_URL,
+  TERMS_URL,
+  WITHDRAWAL_URL,
+} from "@/core/config";
 import type { LegalDocType } from "@/features/legal/application/legalDoc";
 
 const DOC_URLS: Record<LegalDocType, string> = {
   privacy: PRIVACY_URL,
   imprint: LEGAL_NOTICE_URL,
+  terms: TERMS_URL,
+  withdrawal: WITHDRAWAL_URL,
 };
 
 interface LegalDocState {

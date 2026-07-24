@@ -6,7 +6,9 @@ import {
   TEXT_DIVIDER_Y_RATIO,
   TEXT_COUNTRY_Y_RATIO,
   TEXT_COORDS_Y_RATIO,
+  TEXT_ATTRIBUTION_Y_RATIO,
   TEXT_EDGE_MARGIN_RATIO,
+  ATTRIBUTION_OPACITY,
   CITY_FONT_BASE_PX,
   COUNTRY_FONT_BASE_PX,
   COORDS_FONT_BASE_PX,
@@ -60,8 +62,8 @@ export default function PosterTextOverlay({
   const countryFontSize = `${toCqMin(COUNTRY_FONT_BASE_PX)}cqmin`;
   const coordsFontSize = `${toCqMin(COORDS_FONT_BASE_PX)}cqmin`;
   const attributionFontSize = `${toCqMin(ATTRIBUTION_FONT_BASE_PX)}cqmin`;
-  const attributionColor = computeAttributionColor(textColor, landColor, showOverlay);
-  const attributionOpacity = showOverlay ? 0.55 : 0.9;
+  const creditsColor = computeAttributionColor(textColor, landColor, showOverlay);
+  const creditsOpacity = showOverlay ? 0.55 : 0.9;
 
   return (
     <div className="poster-text-overlay" style={{ color: textColor }}>
@@ -111,11 +113,10 @@ export default function PosterTextOverlay({
         className="poster-attribution"
         style={{
           fontFamily: bodyFont,
-          color: attributionColor,
-          opacity: attributionOpacity,
+          color: textColor,
+          opacity: ATTRIBUTION_OPACITY,
           fontSize: attributionFontSize,
-          bottom: `${TEXT_EDGE_MARGIN_RATIO * 100}%`,
-          right: `${TEXT_EDGE_MARGIN_RATIO * 100}%`,
+          top: `${TEXT_ATTRIBUTION_Y_RATIO * 100}%`,
         }}
       >
         &copy; OpenStreetMap contributors
@@ -126,8 +127,8 @@ export default function PosterTextOverlay({
           className="poster-credits"
           style={{
             fontFamily: bodyFont,
-            color: attributionColor,
-            opacity: attributionOpacity,
+            color: creditsColor,
+            opacity: creditsOpacity,
             fontSize: attributionFontSize,
             bottom: `${TEXT_EDGE_MARGIN_RATIO * 100}%`,
             left: `${TEXT_EDGE_MARGIN_RATIO * 100}%`,

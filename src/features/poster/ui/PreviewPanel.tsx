@@ -47,8 +47,7 @@ const UNLOCK_HINT = `${LOCKED_HINT}\nClick to unlock map editing.`;
 const RECENTER_HINT = "Recenter map to the current location";
 const COUNTRY_VIEW_ZOOM_LEVEL = 10;
 const CONTINENT_VIEW_ZOOM_LEVEL = 6;
-const DEFAULT_LOCATION_LABEL =
-  "Hanover, Region Hannover, Lower Saxony, Germany";
+const DEFAULT_LOCATION_LABEL = "Madrid, Comunidad de Madrid, España";
 
 export default function PreviewPanel() {
   const { state, dispatch, effectiveTheme, mapStyle, mapRef } =
@@ -184,9 +183,9 @@ export default function PreviewPanel() {
   const isCountryContinentView =
     mapZoom >= CONTINENT_VIEW_ZOOM_LEVEL && mapZoom < COUNTRY_VIEW_ZOOM_LEVEL;
   const cityLabel = isCityCountryView
-    ? form.displayCity || form.location || "Hanover"
+    ? form.displayCity || form.location || "Madrid"
     : isCountryContinentView
-      ? form.displayCountry || "Germany"
+      ? form.displayCountry || "España"
       : form.displayContinent || "Earth";
   const countryLabel = isCityCountryView
     ? form.displayCountry || "Germany"

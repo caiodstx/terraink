@@ -10,8 +10,16 @@ export const TEXT_DIVIDER_Y_RATIO = 0.875;
 export const TEXT_COUNTRY_Y_RATIO = 0.9;
 export const TEXT_COORDS_Y_RATIO = 0.93;
 
-/** Margin from the edges for attribution/credits. */
+/** OSM attribution sits centered inside the typographic block, under the
+ *  coordinates line, rather than isolated in a loose corner. */
+export const TEXT_ATTRIBUTION_Y_RATIO = 0.965;
+
+/** Margin from the edges for the (optional) app credit line. */
 export const TEXT_EDGE_MARGIN_RATIO = 0.02;
+
+/** Fixed low-contrast opacity for the OSM attribution — legible up close,
+ *  but visually part of the design rather than a standalone banner. */
+export const ATTRIBUTION_OPACITY = 0.6;
 
 /** City text scales down when labels get long. */
 export const CITY_TEXT_SHRINK_THRESHOLD = 10;

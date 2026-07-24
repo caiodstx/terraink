@@ -13,19 +13,18 @@ import { useSwipeDown } from "@/shared/hooks/useSwipeDown";
 import StartupLocationModal from "@/features/location/ui/StartupLocationModal";
 import { CheckIcon } from "@/shared/ui/Icons";
 import { useSessionAnalytics } from "@/features/export/application/useSessionAnalytics";
-import {
-  LEGAL_DOC_EVENT,
-  type LegalDocDetail,
-  type LegalDocType,
-} from "@/features/legal/application/legalDoc";
 
-const LegalModal = lazy(() => import("@/features/legal/ui/LegalModal"));
 const SettingsPanel = lazy(() => import("@/features/poster/ui/SettingsPanel"));
 const AnnouncementModal = lazy(
   () => import("@/features/updates/ui/AnnouncementModal"),
 );
 const ExportFab = lazy(() => import("@/features/export/ui/ExportFab"));
+const BuyFab = lazy(() => import("@/features/checkout/ui/BuyFab"));
+const BuyModal = lazy(() => import("@/features/checkout/ui/BuyModal"));
 const DesktopLocationBar = lazy(() => import("@/shared/ui/DesktopLocationBar"));
+const DevExportBridge = import.meta.env.DEV
+  ? lazy(() => import("@/features/export/ui/DevExportBridge"))
+  : null;
 
 function SettingsDrawer({
   mobileTab,
@@ -88,21 +87,15 @@ export default function AppShell() {
   const [desktopPanelOpen, setDesktopPanelOpen] = useState(false);
   const [desktopLocationRowVisible, setDesktopLocationRowVisible] =
     useState(true);
-  const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      setLegalDoc((e as CustomEvent<LegalDocDetail>).detail.doc);
-    };
-    window.addEventListener(LEGAL_DOC_EVENT, handler);
-    return () => window.removeEventListener(LEGAL_DOC_EVENT, handler);
-  }, []);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
   useEffect(() => {
     const preload = () => {
       void import("@/features/poster/ui/SettingsPanel");
       void import("@/shared/ui/DesktopLocationBar");
       void import("@/features/export/ui/ExportFab");
+      void import("@/features/checkout/ui/BuyFab");
+      void import("@/features/checkout/ui/BuyModal");
       void import("@/features/updates/ui/AnnouncementModal");
     };
 
@@ -296,16 +289,27 @@ export default function AppShell() {
       <Suspense fallback={null}>
         <ExportFab isMobile={isMobileViewport} />
       </Suspense>
+      <Suspense fallback={null}>
+        <BuyFab
+          isMobile={isMobileViewport}
+          onClick={() => setIsBuyModalOpen(true)}
+        />
+      </Suspense>
+      {isBuyModalOpen ? (
+        <Suspense fallback={null}>
+          <BuyModal open onClose={() => setIsBuyModalOpen(false)} />
+        </Suspense>
+      ) : null}
+      {DevExportBridge ? (
+        <Suspense fallback={null}>
+          <DevExportBridge />
+        </Suspense>
+      ) : null}
 
       <FooterNote />
       <Suspense fallback={null}>
         <AnnouncementModal />
       </Suspense>
-      {legalDoc ? (
-        <Suspense fallback={null}>
-          <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
-        </Suspense>
-      ) : null}
     </div>
   );
 }

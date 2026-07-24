@@ -450,6 +450,30 @@
     pointer-events: none;
   }
 
+  .mobile-buy-fab-trigger {
+    position: fixed;
+    right: 16px;
+    bottom: calc(138px + env(safe-area-inset-bottom, 0px));
+    z-index: 101;
+    width: 60px;
+    height: 44px;
+    border: 1px solid rgba(201, 162, 39, 0.5);
+    border-radius: 14px;
+    background: rgba(201, 162, 39, 0.94);
+    color: #1a1206;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.26);
+  }
+
+  .mobile-buy-fab-trigger svg {
+    width: 18px;
+    height: 18px;
+  }
+
   .mobile-marker-edit-done {
     position: fixed;
     left: 16px;

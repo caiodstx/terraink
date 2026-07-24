@@ -43,7 +43,7 @@ export { triggerDownloadBlob } from "@/features/export/infrastructure/fileDownlo
 
 /* ── Analytics ── */
 
-export { trackEvent, setUserProperty } from "@/core/analytics/gtagAnalytics";
+export { trackEvent, setUserProperty } from "@/core/analytics/zarazAnalytics";
 
 /* ── Legal docs ── */
 

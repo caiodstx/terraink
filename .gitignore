@@ -5,6 +5,10 @@ package-lock.json
 # Build output
 dist/
 
+# Original high-res source images (multi-MB) — web-sized derivatives live
+# in public/assets/examples/, regeneratable via DevExportBridge if needed.
+assets-src/
+
 # Logs
 *.log
 npm-debug.log*

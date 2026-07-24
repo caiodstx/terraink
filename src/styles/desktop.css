@@ -37,11 +37,13 @@
    ══════════════════════════════════════════════════════════ */
 
 @media (min-width: 769px) and (hover: hover) and (pointer: fine) {
-  /* ── Prevent body scroll; app fills viewport ── */
+  /* ── Prevent body scroll; app fills viewport — only on the editor
+     route (html.route-editor, toggled in App.tsx). Other routes
+     (landing, order result pages) need normal document scroll. ── */
 
-  html,
-  body,
-  #root {
+  html.route-editor,
+  html.route-editor body,
+  html.route-editor #root {
     height: 100%;
     overflow: hidden;
   }
@@ -851,11 +853,13 @@
   }
 
   .mobile-location-row-wrap,
-  .mobile-export-fab-trigger {
+  .mobile-export-fab-trigger,
+  .mobile-buy-fab-trigger {
     display: none !important;
   }
 
-  .export-fab-trigger-desktop {
+  .export-fab-trigger-desktop,
+  .buy-fab-trigger-desktop {
     display: inline-flex;
   }
 
@@ -863,57 +867,86 @@
     display: none;
   }
 
+  /* Fixed, single-row, full-width only inside the editor (nothing else
+     scrolls there — see html.route-editor + App.tsx). On other routes
+     (landing, order result pages) it's a normal static footer, stacked
+     and centered like an ordinary site footer, since it no longer has
+     a guaranteed full-viewport width to lay 3 columns out in. */
   .desktop-footer {
     display: flex;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 31;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    text-align: left;
+    gap: 8px;
+    text-align: center;
     margin: 0;
-    padding: 8px 18px 8px 82px;
+    padding: 16px 18px;
     border-top: 1px solid rgba(146, 176, 200, 0.12);
     background: var(--overlay-bg);
-    box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.28);
-    white-space: nowrap;
   }
 
   .desktop-footer .source-note,
   .desktop-footer .made-note {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     font-size: 0.66rem;
-    line-height: 1.2;
+    line-height: 1.4;
     margin: 0;
   }
 
   .desktop-footer-left,
   .desktop-footer-middle,
   .desktop-footer-right {
-    min-width: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 
-  .desktop-footer-left {
+  .desktop-footer-right {
+    gap: 8px;
+    position: relative;
+  }
+
+  html.route-editor .desktop-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 16px;
+    text-align: left;
+    padding: 8px 18px 8px 82px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 31;
+    box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.28);
+    white-space: nowrap;
+  }
+
+  html.route-editor .desktop-footer .source-note,
+  html.route-editor .desktop-footer .made-note {
+    flex-wrap: nowrap;
+  }
+
+  html.route-editor .desktop-footer-left,
+  html.route-editor .desktop-footer-middle,
+  html.route-editor .desktop-footer-right {
+    min-width: 0;
+  }
+
+  html.route-editor .desktop-footer-left {
     justify-content: flex-start;
     flex: 1 1 0;
   }
 
-  .desktop-footer-middle {
+  html.route-editor .desktop-footer-middle {
     justify-content: center;
     flex: 0 0 auto;
   }
 
-  .desktop-footer-right {
+  html.route-editor .desktop-footer-right {
     justify-content: flex-end;
     flex: 1 1 0;
-    gap: 8px;
-    position: relative;
   }
 
   .desktop-footer .source-link {

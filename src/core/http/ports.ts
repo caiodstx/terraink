@@ -1,3 +1,5 @@
+export type HttpBody = string | Blob | ArrayBuffer;
+
 export interface IHttp {
   get(
     url: string,
@@ -6,7 +8,7 @@ export interface IHttp {
   ): Promise<Response>;
   post(
     url: string,
-    body: string,
+    body: HttpBody,
     options?: RequestInit,
     timeoutMs?: number,
   ): Promise<Response>;

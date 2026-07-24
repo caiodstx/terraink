@@ -25,6 +25,7 @@ export interface SecondCityExportParams {
   heightCm: number;
   fontFamily: string;
   showPosterText: boolean;
+  dedicationText?: string;
   includeCredits: boolean;
 }
 
@@ -91,6 +92,7 @@ export async function exportSecondCityPoster(
     displayCountry: target.country,
     fontFamily: params.fontFamily,
     showPosterText: params.showPosterText,
+    dedicationText: params.dedicationText,
     // No markers/routes on the second poster — those are specific to the
     // primary design the customer built by hand, not something to copy
     // onto a city they've never actually placed a pin on.

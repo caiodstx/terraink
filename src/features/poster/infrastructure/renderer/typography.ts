@@ -7,12 +7,14 @@ import {
   TEXT_DIVIDER_Y_RATIO,
   TEXT_COUNTRY_Y_RATIO,
   TEXT_COORDS_Y_RATIO,
+  TEXT_DEDICATION_Y_RATIO,
   TEXT_ATTRIBUTION_Y_RATIO,
   TEXT_EDGE_MARGIN_RATIO,
   ATTRIBUTION_OPACITY,
   CITY_FONT_BASE_PX,
   COUNTRY_FONT_BASE_PX,
   COORDS_FONT_BASE_PX,
+  DEDICATION_FONT_BASE_PX,
   ATTRIBUTION_FONT_BASE_PX,
   isLatinScript,
   formatCityLabel,
@@ -32,6 +34,7 @@ export function drawPosterText(
   showPosterText: boolean,
   showOverlay: boolean,
   includeCredits: boolean = true,
+  dedicationText?: string,
 ): void {
   const textColor = theme.ui?.text || "#111111";
   const landColor = theme.map?.land || "#808080";
@@ -85,6 +88,15 @@ export function drawPosterText(
       coordinatesY,
     );
     ctx.globalAlpha = 1;
+
+    const trimmedDedication = dedicationText?.trim();
+    if (trimmedDedication) {
+      const dedicationFontSize = DEDICATION_FONT_BASE_PX * dimScale;
+      ctx.globalAlpha = 0.75;
+      ctx.font = `italic 400 ${dedicationFontSize}px ${bodyFontFamily}`;
+      ctx.fillText(trimmedDedication, width * 0.5, height * TEXT_DEDICATION_Y_RATIO);
+      ctx.globalAlpha = 1;
+    }
   }
 
   // OSM attribution lives centered inside the typographic block, under the

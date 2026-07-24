@@ -27,6 +27,7 @@ interface LayeredSvgOptions {
   displayCountry: string;
   fontFamily?: string;
   showPosterText: boolean;
+  dedicationText?: string;
   showOverlay: boolean;
   includeCredits: boolean;
   markers: MarkerItem[];
@@ -82,6 +83,7 @@ export async function createLayeredSvgBlobFromMap({
   displayCountry,
   fontFamily,
   showPosterText,
+  dedicationText,
   showOverlay,
   includeCredits,
   markers,
@@ -257,6 +259,7 @@ export async function createLayeredSvgBlobFromMap({
           showPosterText,
           showOverlay,
           includeCredits,
+          dedicationText,
         );
       }),
     });

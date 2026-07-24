@@ -10,6 +10,10 @@ export const TEXT_DIVIDER_Y_RATIO = 0.875;
 export const TEXT_COUNTRY_Y_RATIO = 0.9;
 export const TEXT_COORDS_Y_RATIO = 0.93;
 
+/** Optional dedication/date line — sits in the gap between coordinates and
+ *  the (mandatory, never move it) OSM attribution below. */
+export const TEXT_DEDICATION_Y_RATIO = 0.9475;
+
 /** OSM attribution sits centered inside the typographic block, under the
  *  coordinates line, rather than isolated in a loose corner. */
 export const TEXT_ATTRIBUTION_Y_RATIO = 0.965;
@@ -28,6 +32,7 @@ export const CITY_FONT_BASE_PX = 250;
 export const CITY_FONT_MIN_PX = 110;
 export const COUNTRY_FONT_BASE_PX = 92;
 export const COORDS_FONT_BASE_PX = 58;
+export const DEDICATION_FONT_BASE_PX = 46;
 export const ATTRIBUTION_FONT_BASE_PX = 50;
 
 export function isLatinScript(text: string | undefined | null): boolean {

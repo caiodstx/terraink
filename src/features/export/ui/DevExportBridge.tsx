@@ -54,6 +54,7 @@ export default function DevExportBridge() {
           heightCm: Number(form.height),
           fontFamily: form.fontFamily.trim(),
           showPosterText: form.showPosterText,
+          dedicationText: form.dedicationText.trim(),
           includeCredits: form.includeCredits,
         },
       );

@@ -47,6 +47,7 @@ export function useCheckout() {
             heightCm: Number(form.height),
             fontFamily: form.fontFamily.trim(),
             showPosterText: form.showPosterText,
+            dedicationText: form.dedicationText.trim(),
             includeCredits: form.includeCredits,
           });
           const uploaded = await uploadDesign(secondBlob);

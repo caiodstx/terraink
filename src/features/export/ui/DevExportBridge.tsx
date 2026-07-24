@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useExport } from "@/features/export/application/useExport";
+import { usePosterContext } from "@/features/poster/ui/PosterContext";
+import { exportSecondCityPoster } from "@/features/checkout/infrastructure/secondCityExporter";
 import type { ExportFormat } from "@/features/export/domain/types";
 
 /**
@@ -11,6 +13,7 @@ import type { ExportFormat } from "@/features/export/domain/types";
  */
 export default function DevExportBridge() {
   const { exportPoster } = useExport();
+  const { state, effectiveTheme, mapStyle } = usePosterContext();
 
   useEffect(() => {
     (window as any).mapagramaExportFull = (format: ExportFormat = "png") => {
@@ -30,14 +33,46 @@ export default function DevExportBridge() {
         reader.readAsDataURL(blob);
       });
     };
+    // Exercises the BuyModal "second city -20%" upsell's render pipeline
+    // (features/checkout/infrastructure/secondCityExporter.ts) in
+    // isolation — no catalog/Stripe/network dependency, so it works even
+    // without a backend running locally.
+    (window as any).mapagramaExportSecondCityAsync = async (
+      lat: number,
+      lon: number,
+      city: string,
+      country: string,
+    ) => {
+      const { form } = state;
+      const blob = await exportSecondCityPoster(
+        { lat, lon, city, country },
+        {
+          style: mapStyle,
+          theme: effectiveTheme,
+          distanceMeters: Number(form.distance),
+          widthCm: Number(form.width),
+          heightCm: Number(form.height),
+          fontFamily: form.fontFamily.trim(),
+          showPosterText: form.showPosterText,
+          includeCredits: form.includeCredits,
+        },
+      );
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    };
     console.info(
       "[dev] window.mapagramaExportFull('png' | 'pdf' | 'svg') — full 300dpi, no watermark.",
     );
     return () => {
       delete (window as any).mapagramaExportFull;
       delete (window as any).mapagramaExportFullAsync;
+      delete (window as any).mapagramaExportSecondCityAsync;
     };
-  }, [exportPoster]);
+  }, [exportPoster, state, effectiveTheme, mapStyle]);
 
   return null;
 }

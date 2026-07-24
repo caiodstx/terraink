@@ -605,9 +605,58 @@ de Q4 al final — con margen real para no llegar tarde a diciembre.
         8 páginas nuevas.
       - `nginx.conf`: bloque `/estilo/` con el mismo cache de 1h que
         `/mapa/`.
-- [ ] Upsell en BuyModal: segunda ciudad -20% y upgrade a enmarcado.
-      Sube el ticket medio de cada compra actual, sin depender de
-      catálogo nuevo.
+- [x] Upsell en BuyModal (2026-07-24): upgrade a enmarcado + segunda
+      ciudad -20%.
+      - **Upgrade a enmarcado:** nudge inline en `BuyModal.tsx` cuando
+        `kind === "poster"` — calcula el delta real hacia la variante
+        enmarcada (madera natural) del mismo layout y ofrece cambiar con
+        un clic. Sencillo, sin cambios de backend.
+      - **Segunda ciudad -20%** (la pieza grande — decisión explícita del
+        usuario de ir por la versión completa, un solo carrito/checkout
+        con 2 artículos, no un cupón para volver luego):
+        - `secondCityExporter.ts`: renderiza un segundo póster completo
+          (mismo tema/tamaño/tipografía, otra ciudad) en un mapa
+          MapLibre **offscreen independiente** — nunca toca el mapa
+          visible ni el `PosterContext` del diseño que el cliente está
+          editando, así un fallo aquí no puede estropear su sesión
+          activa. Mismo patrón que `mapExporter.ts`'s
+          `captureMapAsCanvas`, reutilizando `mapStyle`/`effectiveTheme`
+          ya resueltos por `usePosterContext()` en vez de reconstruirlos.
+        - Zoom de la segunda ciudad: `distanceToZoom()` con la misma
+          `distanceMeters` del diseño original pero la latitud de la
+          ciudad nueva (afecta la proyección Mercator) — mismo "nivel de
+          zoom" percibido, no los mismos píxeles exactos.
+        - `BuyModal.tsx`: checkbox + buscador de ciudad (reutiliza
+          `useLocationAutocomplete`, el mismo hook del buscador
+          principal del editor) — variante idéntica a la principal
+          (mismo tamaño/marco), solo cambia el precio (-20%).
+        - Backend: `lib/gelato.ts` generalizado de un `productUid`/
+          `fileUrl` sueltos a `items: GelatoOrderItem[]` — los 2 pósters
+          van en **un solo pedido/envío de Gelato**, no dos paquetes
+          separados. `orders.design_id_2`/`variant_id_2` nuevos
+          (migración `ALTER TABLE` idempotente). `POST /checkout` acepta
+          `secondItem?` opcional y añade una segunda `line_item` de
+          Stripe al 80% del precio. El webhook mueve ambos diseños de
+          `pending/` a `purchased/` en R2, crea un único pedido Gelato
+          con los 2 `items`, registra `purchase_completed` dos veces
+          (una por artículo, para que `funnel:report` cuente bien los
+          ingresos) y el email de confirmación lista ambos productos.
+          La recuperación de carrito abandonado (`checkout.session.
+          expired`) solo recupera el artículo principal — simplificación
+          aceptada, no es un bug.
+        - `window.mapagramaExportSecondCityAsync(lat, lon, city,
+          country)` añadido a `DevExportBridge.tsx` (dev-only, mismo
+          patrón que `mapagramaExportFullAsync`) — permite probar el
+          render de la segunda ciudad de forma aislada, sin backend ni
+          Stripe. Así se verificó (Barcelona, resultado visual correcto)
+          antes de tocar producción.
+        - **Verificado con una sesión Stripe real en producción** (creada
+          y luego expirada vía API sin pagar, sin navegar a Stripe): 2
+          `line_items` (29,00€ + 23,20€ = 52,20€, el -20% exacto),
+          metadata con `designId`/`designId2`/`variantId`/`variantId2`
+          completos. El webhook de expiración no disparó ningún email
+          (sesión sin `customer_details`, como se espera al no haber
+          llegado a la página de Stripe).
 - [ ] Línea de texto personalizable bajo coordenadas (dedicatoria/fecha).
       Encaja con las landings de regalo ya publicadas
       (`/regalo-aniversario`, `/regalo-pareja`, `/regalo-mudanza`) —

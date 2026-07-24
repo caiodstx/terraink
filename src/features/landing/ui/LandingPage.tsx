@@ -132,8 +132,8 @@ export default function LandingPage() {
 
       <section className="landing-hero">
         <div className="landing-hero-copy">
-          <p className="landing-hero-eyebrow">Tu ciudad, convertida en un póster.</p>
-          <h1>Póster de mapa personalizado de tu ciudad</h1>
+          <p className="landing-hero-eyebrow">El mapa de un lugar que significa algo.</p>
+          <h1>Tu ciudad en un póster de mapa personalizado</h1>
           <p>
             Elige tu ciudad, personaliza colores, capas y texto en un editor
             en vivo, y recibe tu mapa impreso en casa. Producción en España.

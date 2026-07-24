@@ -564,6 +564,18 @@ Dos hallazgos ya corregidos, uno queda pendiente a propósito:
       consistencia. `<meta name="keywords">` eliminada (Google la ignora
       desde 2009, solo sirve para revelar la estrategia SEO a quien mire
       el código fuente).
+      **Revisado de nuevo (2026-07-24):** la primera versión sonaba a
+      trabalenguas ("Póster de mapa personalizado de tu ciudad"). Cambiado
+      a **"Tu ciudad en un póster de mapa personalizado"** — orden más
+      natural (sujeto primero), mantiene "mapa personalizado" intacto (la
+      keyword real, la que la gente busca) en vez de la alternativa más
+      simple que se barajó ("Póster de tu ciudad totalmente
+      personalizable"), que la eliminaba. Mismo cambio en `<title>`,
+      `og:title`, `twitter:title` e `<h1>` de `LandingPage.tsx`. El
+      eyebrow de encima del H1 también cambió, de "Tu ciudad, convertida
+      en un póster." (ahora redundante con el H1 nuevo) a "El mapa de un
+      lugar que significa algo." — enlaza mejor con el ángulo de regalo
+      ya presente en `/regalo-*`.
 - [ ] **Pre-renderizado de la landing** (decidido explícitamente aplazar,
       2026-07-24): el `<body>` de `/` está vacío hasta que React monta —
       el `<head>` (title/description/OG/JSON-LD) ya es HTML estático real

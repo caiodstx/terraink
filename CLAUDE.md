@@ -517,11 +517,32 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
         en Stripe (`livemode: true`, ligado al coupon `welcome10`,
         `max_redemptions: 1`), reenviar el mismo email devuelve el mismo
         código sin duplicar.
-- [ ] Email post-entrega (webhook delivered de Gelato, +5-7 días):
-      pedir reseña + foto del cuadro colgado. Incentivo: -15% en el
-      siguiente pedido.
-- [ ] Sección de reseñas/fotos reales de clientes en la landing
-      (con permiso explícito de uso de imagen).
+- [x] Email post-entrega (2026-07-24): +6 días desde `delivered_at`
+      (mitad de la ventana 5-7 días pedida), pide reseña + foto por
+      respuesta directa al email (no hay formulario web — de momento el
+      fundador lee las respuestas a mano y las añade a `reviews.ts`, ver
+      abajo). Incentivo: cupón Stripe `returning15` (-15%, un código de
+      un solo uso por pedido, mismo patrón que `welcome10`).
+      - `orders.delivered_at`/`review_email_sent_at` nuevos (migración
+        `ALTER TABLE` idempotente en `db.ts` — la tabla ya existía en
+        producción). `setOrderStatus` estampa `delivered_at` la primera
+        vez que ve status `delivered` (COALESCE, no se pisa en reentregas
+        del webhook).
+      - `bun run emails:review` (`sendReviewEmails.ts`), cron diario a
+        las 9:00 en el VPS (mismo patrón que el backup de las 3:00).
+      - `replyTo: contacto@mapagrama.com` explícito (es la dirección con
+        reenvío real configurado en Cloudflare Email Routing — `orders@`,
+        el remitente, puede que no reciba correo entrante).
+      - Probado en producción: migración aplicada a la tabla real
+        (pedido existente sigue `in_transit`, `delivered_at` null),
+        `bun run emails:review` corre limpio y no envía nada todavía
+        (correcto, ningún pedido cumple la condición aún).
+- [~] Sección de reseñas/fotos reales de clientes en la landing (con
+      permiso explícito de uso de imagen) — el componente ya existe
+      (`ReviewsSection.tsx` + `src/data/reviews.ts`, Fase 7.5) pero está
+      vacío: no hay reseñas reales todavía. El email post-entrega de
+      arriba es el mecanismo que las va a generar; cuando lleguen
+      respuestas reales, añadirlas a mano a `reviews.ts`.
 - [ ] Uptime monitor externo (mapagrama.com + /api/catalog) y alerta
       si un webhook Stripe/Gelato falla repetidamente.
 

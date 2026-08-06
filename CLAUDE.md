@@ -1047,6 +1047,85 @@ intactos tamaños/precios/descuento de segunda ciudad/flujo de compra.
          `Last-Modified`) antes y después de la purga. Van ya tres
          veces que este mismo patrón muerde un despliegue.
 
+### Fase 7.7 — Rediseño de la landing con Hallmark (2026-08-07)
+
+Petición del usuario: instalar el skill de diseño
+[nutlope/hallmark](https://github.com/nutlope/hallmark) (`npx skills add
+nutlope/hallmark`) y usarlo para mejorar la landing, probando primero en
+dev antes de tocar producción. El instalador lo dejó en
+`.agents/skills/hallmark/` (symlink a `.claude/skills/hallmark`,
+project-scoped) — **no versionado**: el usuario decidió explícitamente
+dejar fuera del repo público las herramientas del propio skill
+(`.agents/`, `.hallmark/`, `AGENTS.md`, `skills-lock.json`, añadidos a
+`.gitignore`), es tooling de desarrollo, no parte de la app servida.
+
+- [x] **Escaneo previo (pre-flight) antes de tocar nada:** fuentes
+      (Bebas Neue + Instrument Sans + Spline Sans Mono, Google Fonts
+      `@import` en `base.css:1`), paleta (hex/rgba en `:root`, no
+      OKLCH — navy `#080f18`, dorado `#c9a227`), sin librería de
+      animación, sin escala de espaciado formal. Decisión explícita:
+      preservar tipografía y la identidad "Midnight Blue" entera — el
+      navy y el dorado no se sustituyen por nada nuevo, se convierten a
+      OKLCH tal cual (`oklch(16.6% 0.022 253)` y
+      `oklch(72.8% 0.138 90)`, calculados con conversión sRGB→OKLab
+      real, no aproximados a ojo).
+- [x] **Macroestructura: Photographic** (una de las 21 del catálogo de
+      Hallmark) — "la imagen manda, el texto es anotación, mira antes
+      de leer". Encaja con que el producto en sí es una foto (el
+      póster en la pared). El usuario eligió explícitamente la versión
+      "pura" del macrostructure frente a una adaptación más
+      conservadora, sabiendo que tocaría el CTA del hero (de botón a
+      link tipográfico), las cabeceras (sin centrar) y el ritmo de
+      secciones.
+      - Nav → **N6 Newspaper masthead** (wordmark centrado, línea de
+        contexto arriba, doble regla). Footer (`FooterNote.tsx`) **sin
+        tocar** — componente compartido con el resto del sitio, fuera
+        del alcance de este rediseño.
+      - Hero → **H6 Photographic fold**: foto real a sangre completa
+        (el mismo mockup ya usado como LCP), texto+CTA superpuestos en
+        una esquina en vez de la maquetación anterior a dos columnas.
+      - Secciones "Por qué Mapagrama" y "Cómo funciona" pasan de
+        tarjetas con icono (el patrón "3-feature row" que el propio
+        skill marca como anti-patrón — gate 3) a listas con líneas
+        finas divisorias.
+      - FAQ y precios: mismo contenido exacto, cabeceras colgantes en
+        vez de cajas con borde.
+- [x] **Un bug real encontrado con capturas, no a ojo:** la etiqueta
+      numerada de las fotos de ejemplo (`02 · Barcelona`) se posicionaba
+      en la esquina inferior derecha de toda la figura mockup+póster —
+      como el panel del póster (a la derecha) es más estrecho que el
+      de la habitación (a la izquierda), la etiqueta acababa tapando el
+      propio texto impreso del póster ("BARCELONA" cortado). Arreglado
+      moviendo la etiqueta a la esquina inferior **izquierda**, que
+      siempre cae sobre la foto de la habitación (fondo más simple, sin
+      texto que tapar) — confirmado con capturas antes/después en
+      escritorio y móvil.
+- [x] **Verificado, no solo revisado a ojo, antes de dar por bueno el
+      rediseño:**
+      - El texto visible del FAQ coincide carácter a carácter con el
+        `FAQPage` JSON-LD (comparación programática de los 5 items, no
+        solo lectura visual).
+      - Cero errores de consola del navegador.
+      - `bun run build` completo (cliente + SSR + pre-renderizado) sin
+        fallos — el HTML servido en `/` lleva el hero nuevo de verdad
+        (`app-shell.html`, usado por el resto de rutas, confirmado que
+        sigue vacío).
+      - Sin scroll horizontal a 320px de ancho (el viewport más
+        estrecho que exige la disciplina del skill).
+      - CTA sticky móvil (`StickyMobileCta.tsx`, sin tocar su lógica)
+        sigue activándose correctamente al salir el CTA del hero del
+        viewport.
+      - Todos los `href`/`trackEvent` de `LandingPage.tsx` intactos —
+        solo se tocó la estructura visual, ningún componente hijo
+        (`ReviewsSection.tsx`, `EmailCaptureBanner.tsx`,
+        `StickyMobileCta.tsx`) se modificó, solo se les dio estilo
+        nuevo reutilizando sus clases CSS existentes.
+- [x] Aprobado por el usuario en dev (`bun run dev`) antes de comitear.
+      Desplegado a producción y verificado con capturas reales contra
+      `mapagrama.com` (no solo local) tras el despliegue — mismas
+      comprobaciones (badges de foto, hero, FAQ) repetidas contra el
+      sitio real.
+
 ## Convenciones de trabajo
 
 - Idioma de código/comentarios: español en comentarios, inglés en

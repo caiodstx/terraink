@@ -46,3 +46,9 @@ updates.json
 
 # ignore agent setting files
 .claude/
+
+# Hallmark design skill (dev tooling, not part of the shipped app)
+.agents/
+.hallmark/
+AGENTS.md
+skills-lock.json

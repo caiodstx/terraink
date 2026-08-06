@@ -120,40 +120,41 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page">
-      <header className="landing-header">
-        <div className="landing-brand">
-          <img src="/assets/logo.svg" alt="" className="landing-logo" />
-          <span className="landing-brand-name">Mapagrama</span>
+      <header className="landing-mast">
+        <p className="landing-mast-line">Mapas personalizados · impresos en España</p>
+        <div className="landing-mast-row">
+          <img src="/assets/logo.svg" alt="" className="landing-mast-mark" />
+          <span className="landing-mast-name">MAPAGRAMA</span>
         </div>
-        <Link to="/crear" className="landing-nav-cta">
-          Crear mi mapa
-        </Link>
+        <nav className="landing-mast-nav" aria-label="Principal">
+          <Link to="/crear">Crear mi mapa →</Link>
+        </nav>
+        <hr className="landing-mast-rule" aria-hidden="true" />
       </header>
 
-      <section className="landing-hero">
-        <div className="landing-hero-copy">
+      <section className="landing-hero-photo">
+        {/* Matches the preloaded LCP image in index.html (the <link
+            rel="preload"> there is what actually drives fetch priority)
+            — same file, no lazy loading here (it's above the fold on
+            first paint). */}
+        <picture>
+          <source srcSet="/assets/examples/mockups/hero-valencia.webp" type="image/webp" />
+          <img
+            className="landing-hero-photo-bleed"
+            src="/assets/examples/mockups/hero-valencia.jpg"
+            alt="Póster de mapa de Valencia enmarcado en una habitación"
+          />
+        </picture>
+        <div className="landing-hero-caption">
           <p className="landing-hero-eyebrow">El mapa de un lugar que significa algo.</p>
           <h1>Tu ciudad en un póster de mapa personalizado</h1>
           <p>
             Elige tu ciudad, personaliza colores, capas y texto en un editor
-            en vivo, y recibe tu mapa impreso en casa. Producción en España.
+            en vivo, y recibe tu mapa impreso en casa.
           </p>
-          <Link to="/crear" className="landing-hero-cta" ref={heroCtaRef}>
-            Empieza a diseñar
+          <Link to="/crear" className="landing-hero-link" ref={heroCtaRef}>
+            Empieza a diseñar →
           </Link>
-        </div>
-        <div className="landing-hero-media">
-          {/* Matches the preloaded LCP image in index.html (the <link
-              rel="preload"> there is what actually drives fetch priority)
-              — same file, no lazy loading here (it's above the fold on
-              first paint). */}
-          <picture>
-            <source srcSet="/assets/examples/mockups/hero-valencia.webp" type="image/webp" />
-            <img
-              src="/assets/examples/mockups/hero-valencia.jpg"
-              alt="Póster de mapa de Valencia enmarcado en una habitación"
-            />
-          </picture>
         </div>
       </section>
 
@@ -162,35 +163,35 @@ export default function LandingPage() {
       </p>
 
       <section className="landing-examples">
-        <h2>Ejemplos</h2>
-        <div className="landing-examples-grid">
-          {EXAMPLE_CITIES.map(({ city, image }) => (
-            <div key={city} className="landing-example-card">
-              <div className="landing-example-pair">
-                <picture className="landing-example-pair-mockup">
-                  <source srcSet={`/assets/examples/mockups/${image}.webp`} type="image/webp" />
-                  <img
-                    src={`/assets/examples/mockups/${image}.jpg`}
-                    alt={`Póster de mapa de ${city} enmarcado en una habitación`}
-                    loading="lazy"
-                  />
-                </picture>
-                <picture className="landing-example-pair-poster">
-                  <source srcSet={`/assets/examples/${image}.webp`} type="image/webp" />
-                  <img
-                    src={`/assets/examples/${image}.jpg`}
-                    alt={`Póster de mapa de ${city}`}
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
-              <p className="landing-example-caption">{city}</p>
-            </div>
+        <p className="landing-section-head">Ejemplos</p>
+        <div className="landing-examples-stack">
+          {EXAMPLE_CITIES.map(({ city, image }, index) => (
+            <figure key={city} className="landing-photo-fold">
+              <picture className="landing-example-pair-mockup">
+                <source srcSet={`/assets/examples/mockups/${image}.webp`} type="image/webp" />
+                <img
+                  src={`/assets/examples/mockups/${image}.jpg`}
+                  alt={`Póster de mapa de ${city} enmarcado en una habitación`}
+                  loading="lazy"
+                />
+              </picture>
+              <picture className="landing-example-pair-poster">
+                <source srcSet={`/assets/examples/${image}.webp`} type="image/webp" />
+                <img
+                  src={`/assets/examples/${image}.jpg`}
+                  alt={`Póster de mapa de ${city}`}
+                  loading="lazy"
+                />
+              </picture>
+              <figcaption className="landing-photo-fold-caption">
+                {String(index + 1).padStart(2, "0")} · {city}
+              </figcaption>
+            </figure>
           ))}
         </div>
 
         <div className="landing-styles">
-          <h3>Un mapa, infinitos estilos</h3>
+          <p className="landing-section-head">Un mapa, infinitos estilos</p>
           <div className="landing-styles-grid">
             {STYLES.map(({ slug, themeId, name }) => (
               <a key={slug} href={`/estilo/${slug}/`} className="landing-style-card">
@@ -210,10 +211,10 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-why">
-        <h2>Por qué Mapagrama</h2>
-        <div className="landing-why-grid">
+        <p className="landing-section-head">Por qué Mapagrama</p>
+        <div className="landing-why-list">
           {WHY_CARDS.map(({ title, body }) => (
-            <div key={title} className="landing-why-card">
+            <div key={title} className="landing-why-row">
               <strong>{title}</strong>
               <p>{body}</p>
             </div>
@@ -222,18 +223,21 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-steps">
-        <h2>Cómo funciona</h2>
+        <p className="landing-section-head">Cómo funciona</p>
         <ol className="landing-steps-list">
           <li>
-            <strong>1. Elige tu ciudad</strong>
+            <span className="landing-steps-num">01</span>
+            <strong>Elige tu ciudad</strong>
             <p>Busca cualquier lugar del mundo.</p>
           </li>
           <li>
-            <strong>2. Personaliza</strong>
+            <span className="landing-steps-num">02</span>
+            <strong>Personaliza</strong>
             <p>Colores, capas del mapa, texto y marco.</p>
           </li>
           <li>
-            <strong>3. Recibe tu póster</strong>
+            <span className="landing-steps-num">03</span>
+            <strong>Recibe tu póster</strong>
             <p>Impreso y enviado a tu casa desde España.</p>
           </li>
         </ol>
@@ -242,7 +246,7 @@ export default function LandingPage() {
       <ReviewsSection />
 
       <section className="landing-pricing">
-        <h2>Precios</h2>
+        <p className="landing-section-head">Precios</p>
         <ul className="landing-pricing-list">
           {PRICE_ROWS.map((row) => (
             <li key={row.label}>
@@ -251,13 +255,13 @@ export default function LandingPage() {
             </li>
           ))}
         </ul>
-        <Link to="/crear" className="landing-hero-cta">
-          Empieza a diseñar
+        <Link to="/crear" className="landing-hero-link">
+          Empieza a diseñar →
         </Link>
       </section>
 
       <section className="landing-gifts">
-        <h2>Ideas de regalo</h2>
+        <p className="landing-section-head">Ideas de regalo</p>
         <div className="landing-gifts-grid">
           {GIFT_INTENTS.map(({ slug, title, teaser }) => (
             <a key={slug} href={`/${slug}/`} className="landing-gift-card">
@@ -271,7 +275,7 @@ export default function LandingPage() {
       <EmailCaptureBanner />
 
       <section className="landing-faq">
-        <h2>Preguntas frecuentes</h2>
+        <p className="landing-section-head">Preguntas frecuentes</p>
         <dl className="landing-faq-list">
           {FAQ_ITEMS.map(({ question, answer }) => (
             <div key={question} className="landing-faq-item">
@@ -292,7 +296,7 @@ export default function LandingPage() {
       />
 
       <section className="landing-cities" id="landing-cities">
-        <h2>Pósters de mapa por ciudad</h2>
+        <p className="landing-section-head">Pósters de mapa por ciudad</p>
         {/* <details> collapses the list visually, but every <a> stays in
             the DOM either way — SEO/crawlers see the full list regardless
             of open/closed state. */}

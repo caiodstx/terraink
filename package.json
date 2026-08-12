@@ -16,6 +16,8 @@
     "render:cities": "bun run scripts/render-city-posters.mjs",
     "render:styles": "bun run scripts/render-style-examples.mjs",
     "process:examples": "bun run scripts/process-examples.mjs",
+    "render:pinterest": "bun run scripts/render-pinterest-posters.mjs",
+    "process:pinterest": "bun run scripts/process-pinterest.mjs",
     "deploy": "bash scripts/deploy-frontend.sh"
   },
   "dependencies": {

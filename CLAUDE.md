@@ -381,6 +381,29 @@ oscuro, callejero dorado, bloque tipográfico con ciudad/país/coordenadas).
       dos plataformas. Primeros 15 pines creados (12 ciudades variadas +
       las 3 páginas de regalo), usando las imágenes ya generadas y
       copys preparados para cada uno.
+- [x] Contenido ampliado para Pinterest (2026-08-07): un póster por cada
+      una de las 70 ciudades de `src/data/cities.ts`, rotando entre los
+      8 estilos curados de `src/data/styles.ts` (ciudad `i` → estilo
+      `i % 8`) para que el tablero muestre variedad de personalización
+      real en vez de 70 imágenes idénticas en Midnight Blue. Mismo
+      pipeline de render real que `render-city-posters.mjs`
+      (`window.mapagramaExportFullAsync`, no un mockup) — script nuevo
+      `scripts/render-pinterest-posters.mjs` (`bun run render:pinterest`,
+      acepta un límite opcional para probar con pocas ciudades primero).
+      **Esquina doblada como protección anti-copia:** cada imagen final
+      lleva un efecto "dog-ear" en la esquina inferior derecha (sombra +
+      degradado tipo papel + marca de agua "MAPAGRAMA.COM" en diagonal,
+      compuesto vía Sharp/SVG) — práctica ya usada por otras webs de
+      mapas para que la imagen no sirva como archivo limpio reutilizable
+      ni siquiera a baja resolución. Prototipado primero sobre una sola
+      imagen y revisado visualmente antes de aplicarlo a las 70. Script
+      nuevo `scripts/process-pinterest.mjs` (`bun run process:pinterest`).
+      Salida en `assets-src/pinterest(-final)/` — gitignored igual que
+      el resto de `assets-src/`, es contenido de marketing generado, no
+      parte de la app servida ni del feed de producto (que debe seguir
+      mostrando fotos de producto limpias, sin marca de agua). **Subida
+      a Pinterest pendiente del usuario** — acción manual en su
+      dashboard, mismo patrón que los primeros 15 pines.
 - [x] Técnico (2026-07-22): cache-control 1h en `/mapa/*` (nginx.conf —
       no es 1y/immutable como `/assets/` porque no lleva hash de
       contenido en la URL), imágenes de ejemplo/mockups en WebP con
